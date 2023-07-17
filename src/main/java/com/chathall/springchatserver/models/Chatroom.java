@@ -12,7 +12,7 @@ import java.util.Set;
 @Setter
 @Accessors(chain = true)
 @Document
-public class Chatroom extends BaseModel{
+public class Chatroom extends BaseModel {
 
     private String name;
     @DocumentReference

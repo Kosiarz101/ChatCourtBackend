@@ -15,14 +15,12 @@ public class AppUserController {
 
     private final AppUserService appUserService;
 
-    @CrossOrigin(origins = "http://localhost:4200")
     @PostMapping
     public ResponseEntity<AppUser> add(@RequestBody AppUser appUser) {
         appUserService.add(appUser);
         return ResponseEntity.status(201).body(appUserService.getById(appUser.getId()).get());
     }
 
-    @CrossOrigin(origins = "http://localhost:4200")
     @GetMapping(path = "/exists")
     public ResponseEntity<Boolean> exists(@RequestParam(required = false) UUID id,
                                           @RequestParam(required = false) String email) {
