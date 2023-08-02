@@ -20,7 +20,7 @@ public class AppUserService {
     private final MongoTemplate mongoTemplate;
 
     public void add(AppUser appUser) {
-        appUser.setId(UUID.randomUUID());
+        appUser.setNewId();
         appUser.setCreationDate(LocalDateTime.now());
         appUserRepository.save(appUser);
     }

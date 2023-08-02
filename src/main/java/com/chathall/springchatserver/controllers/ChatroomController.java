@@ -1,5 +1,7 @@
 package com.chathall.springchatserver.controllers;
 
+import com.chathall.springchatserver.dtos.chatcourtfrontend.ChatroomDTO;
+import com.chathall.springchatserver.dtos.mappers.ChatroomDTOMapper;
 import com.chathall.springchatserver.models.Chatroom;
 import com.chathall.springchatserver.services.mongodb.ChatroomService;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 public class ChatroomController {
 
     private final ChatroomService chatroomService;
+    private final ChatroomDTOMapper chatroomDTOMapper;
 
     @PostMapping
     public ResponseEntity<Chatroom> add(@RequestBody Chatroom chatroom) {
@@ -21,7 +24,7 @@ public class ChatroomController {
     }
 
     @GetMapping
-    public ResponseEntity<Slice<Chatroom>> getAllPageable(@RequestParam(required = false) Integer page, @RequestParam(required = false) Integer size) {
+    public ResponseEntity<Slice<ChatroomDTO>> getAllPageable(@RequestParam(required = false) Integer page, @RequestParam(required = false) Integer size) {
         Slice<Chatroom> chatrooms;
         if (page == null)
             page = 0;
@@ -29,6 +32,7 @@ public class ChatroomController {
             chatrooms = chatroomService.getAllPageable(page);
         else
             chatrooms = chatroomService.getAllPageable(page, size);
-        return ResponseEntity.ok(chatrooms);
+        Slice<ChatroomDTO> results = chatrooms.map(chatroomDTOMapper::toDTO);
+        return ResponseEntity.ok(results);
     }
 }

@@ -11,6 +11,15 @@ java {
 	sourceCompatibility = '17'
 }
 
+compileJava {
+	options.compilerArgs = [
+			'-Amapstruct.suppressGeneratorTimestamp=true',
+			'-Amapstruct.suppressGeneratorVersionInfoComment=true',
+			'-Amapstruct.verbose=true',
+			'-Amapstruct.defaultComponentModel=spring'
+	]
+}
+
 configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
@@ -21,14 +30,18 @@ repositories {
 	mavenCentral()
 }
 
+def mapstructVersion = "1.5.5.Final"
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+	implementation "org.mapstruct:mapstruct:${mapstructVersion}"
 
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
+	annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 

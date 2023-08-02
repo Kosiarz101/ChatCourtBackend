@@ -1,10 +1,8 @@
-package com.chathall.springchatserver.models;
-
+package com.chathall.springchatserver.dtos.chatcourtfrontend;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import org.springframework.data.annotation.Id;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -12,12 +10,8 @@ import java.util.UUID;
 @Getter
 @Setter
 @Accessors(chain = true)
-public abstract class BaseModel {
+public class BaseDTO {
 
-    @Id
     private UUID id = UUID.randomUUID();
     private LocalDateTime creationDate;
-    public void setNewId() {
-        id = UUID.randomUUID();
-    }
 }

@@ -13,7 +13,7 @@ import org.springframework.data.mongodb.core.mapping.DocumentReference;
 @Document
 public class Message extends BaseModel {
 
-    @Size(max = 20)
+    @Size(max = 500)
     private String content;
     @DocumentReference
     private AppUser author;
