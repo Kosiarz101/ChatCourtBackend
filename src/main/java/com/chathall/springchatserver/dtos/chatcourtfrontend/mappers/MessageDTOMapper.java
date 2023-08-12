@@ -1,4 +1,4 @@
-package com.chathall.springchatserver.dtos.mappers;
+package com.chathall.springchatserver.dtos.chatcourtfrontend.mappers;
 
 import com.chathall.springchatserver.dtos.chatcourtfrontend.MessageDTO;
 import com.chathall.springchatserver.models.BaseModel;

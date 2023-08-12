@@ -1,7 +1,7 @@
 package com.chathall.springchatserver.controllers;
 
 import com.chathall.springchatserver.dtos.chatcourtfrontend.ChatroomDTO;
-import com.chathall.springchatserver.dtos.mappers.ChatroomDTOMapper;
+import com.chathall.springchatserver.dtos.chatcourtfrontend.mappers.ChatroomDTOMapper;
 import com.chathall.springchatserver.models.Chatroom;
 import com.chathall.springchatserver.services.mongodb.ChatroomService;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,8 @@ public class ChatroomController {
     }
 
     @GetMapping
-    public ResponseEntity<Slice<ChatroomDTO>> getAllPageable(@RequestParam(required = false) Integer page, @RequestParam(required = false) Integer size) {
+    public ResponseEntity<Slice<ChatroomDTO>> getAllPageable(@RequestParam(required = false) Integer page,
+                                                             @RequestParam(required = false) Integer size) {
         Slice<Chatroom> chatrooms;
         if (page == null)
             page = 0;

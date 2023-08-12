@@ -1,7 +1,7 @@
 package com.chathall.springchatserver.controllers;
 
 import com.chathall.springchatserver.dtos.chatcourtfrontend.MessageDTO;
-import com.chathall.springchatserver.dtos.mappers.MessageDTOMapper;
+import com.chathall.springchatserver.dtos.chatcourtfrontend.mappers.MessageDTOMapper;
 import com.chathall.springchatserver.models.Message;
 import com.chathall.springchatserver.services.mongodb.MessageService;
 import lombok.RequiredArgsConstructor;
