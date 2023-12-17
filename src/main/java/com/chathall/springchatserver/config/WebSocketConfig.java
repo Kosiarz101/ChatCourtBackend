@@ -1,5 +1,6 @@
 package com.chathall.springchatserver.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -9,10 +10,14 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+
+    @Value("${client.chat-court-frontend.url}")
+    private String chatCourtFrontendUrl;
+
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
          registry.addEndpoint("/ws")
-                 .setAllowedOrigins("http://localhost:4200", "http://77.46.80.246:4200");
+                 .setAllowedOrigins(chatCourtFrontendUrl);
     }
 
     @Override

@@ -44,6 +44,8 @@ public class ApplicationConfig {
 
     @Value("${jwt.secret-key}")
     private String secretKeyAsString;
+    @Value("${client.chat-court-frontend.url}")
+    private String chatCourtFrontendUrl;
 
     @Bean
     public AuthenticationManager authenticationManager(UserDetailsService userDetailsService,
@@ -84,7 +86,7 @@ public class ApplicationConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:4200", "http://77.46.80.246:4200"));
+        configuration.setAllowedOrigins(List.of(chatCourtFrontendUrl));
         configuration.setAllowedMethods(List.of("POST", "GET", "PUT", "DELETE"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
