@@ -31,6 +31,7 @@ repositories {
 }
 
 def mapstructVersion = "1.5.5.Final"
+def springVersion = "6.1.1"
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
@@ -39,6 +40,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation "org.springframework.security:spring-security-messaging:${springVersion}"
 	implementation "org.mapstruct:mapstruct:${mapstructVersion}"
 
 	compileOnly 'org.projectlombok:lombok'

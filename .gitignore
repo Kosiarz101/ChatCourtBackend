@@ -38,3 +38,4 @@ out/
 
 ### Custom ###
 /src/main/resources/secrets.properties
+/src/main/resources/keystore/
