@@ -1,7 +1,11 @@
 package com.chathall.springchatserver.controllers;
 
+import com.chathall.springchatserver.dtos.chatcourtfrontend.AppUserDTO;
 import com.chathall.springchatserver.dtos.chatcourtfrontend.LoginRequestDTO;
+import com.chathall.springchatserver.dtos.chatcourtfrontend.mappers.AppUserDTOMapper;
+import com.chathall.springchatserver.models.AppUser;
 import com.chathall.springchatserver.services.JWTTokenService;
+import com.chathall.springchatserver.services.mongodb.AppUserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
@@ -26,30 +30,34 @@ import org.springframework.web.server.ResponseStatusException;
 public class AuthController {
 
     private final JWTTokenService tokenService;
+    private final AppUserService appUserService;
+    private final AppUserDTOMapper appUserDTOMapper;
     private final AuthenticationManager authenticationManager;
     @Value(value = "${jwt.cookie.name}")
     private String AUTHORIZATION_HEADER;
 
     @PostMapping("/login")
-    public ResponseEntity<TokenResponse> token(@RequestBody LoginRequestDTO loginRequestDTO, HttpServletResponse response) {
+    public ResponseEntity<AppUserDTO> token(@RequestBody LoginRequestDTO loginRequestDTO, HttpServletResponse response) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequestDTO.getEmail(), loginRequestDTO.getPassword())
         );
+        AppUser appUser = appUserService.getByEmail(loginRequestDTO.getEmail())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatusCode.valueOf(400)));
         try {
-            return createTokenResponse(tokenService.generateToken(authentication), response);
+            addTokenToCookie(tokenService.generateToken(authentication), response);
+            return ResponseEntity.ok().body(appUserDTOMapper.toDTO(appUser));
         } catch (Exception exception) {
             throw new ResponseStatusException(HttpStatusCode.valueOf(400));
         }
     }
 
-    private ResponseEntity<TokenResponse> createTokenResponse(String token, HttpServletResponse response) {
+    private void addTokenToCookie(String token, HttpServletResponse response) {
         Cookie cookie = new Cookie(AUTHORIZATION_HEADER, token);
         cookie.setHttpOnly(true);
         cookie.setSecure(true);
         cookie.setAttribute("SameSite", "None");
         cookie.setPath("/");
         response.addCookie(cookie);
-        return ResponseEntity.ok().body(new TokenResponse(token));
     }
 
     @Getter

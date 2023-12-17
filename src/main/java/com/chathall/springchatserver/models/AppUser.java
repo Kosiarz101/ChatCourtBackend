@@ -1,5 +1,6 @@
 package com.chathall.springchatserver.models;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -18,6 +19,8 @@ import java.util.Set;
 @Document
 public class AppUser extends BaseModel implements UserDetails {
 
+    @Setter(AccessLevel.NONE)
+    @Getter(AccessLevel.NONE)
     private String email;
     private String password;
     private String username;

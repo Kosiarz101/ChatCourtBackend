@@ -3,6 +3,7 @@ package com.chathall.springchatserver.services.mongodb;
 import com.chathall.springchatserver.models.AppUser;
 import com.chathall.springchatserver.repositories.AppUserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -13,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -24,11 +26,11 @@ public class AppUserService implements UserDetailsService {
     private final AppUserRepository appUserRepository;
     private final MongoTemplate mongoTemplate;
 
-    public void add(AppUser appUser) {
+    public AppUser add(AppUser appUser) {
         appUser.setNewId();
         appUser.setCreationDate(LocalDateTime.now());
         appUser.setPassword(passwordEncoder.encode(appUser.getPassword()));
-        appUserRepository.save(appUser);
+        return appUserRepository.save(appUser);
     }
 
     public Optional<AppUser> getById(UUID id) {
@@ -37,6 +39,14 @@ public class AppUserService implements UserDetailsService {
 
     public Optional<AppUser> getByEmail(String email) {
         return appUserRepository.findByEmail(email);
+    }
+
+    public Slice<AppUser> getBy(Map<String, Object> parameters, Integer page, Integer size) {
+        Query query = new Query();
+        for (Map.Entry<String, Object> entry : parameters.entrySet()) {
+            query.addCriteria(createCriteria(entry.getKey(), entry.getValue()));
+        }
+        throw new UnsupportedOperationException();
     }
 
     public boolean exists(String field, String value) {
@@ -54,5 +64,9 @@ public class AppUserService implements UserDetailsService {
         if (appUser.isEmpty())
             throw new UsernameNotFoundException(email);
         return appUser.get();
+    }
+
+    private Criteria createCriteria(String field, Object value) {
+        return Criteria.where(field).is(value);
     }
 }

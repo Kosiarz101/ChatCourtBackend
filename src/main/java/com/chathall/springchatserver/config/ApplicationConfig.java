@@ -39,6 +39,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 @Configuration
+//@EnableWebSocketSecurity
 public class ApplicationConfig {
 
     @Value("${jwt.secret-key}")
@@ -64,8 +65,9 @@ public class ApplicationConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests((requests) ->
                         requests.requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
-                                .requestMatchers("/user/exists").permitAll()
-                                .requestMatchers("/user").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/user/exists-by-email").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/user").permitAll()
+                                .requestMatchers("/ws").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -82,11 +84,18 @@ public class ApplicationConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:4200"));
+        configuration.setAllowedOrigins(List.of("http://localhost:4200", "http://77.46.80.246:4200"));
         configuration.setAllowedMethods(List.of("POST", "GET", "PUT", "DELETE"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
+
+        CorsConfiguration configurationWebSocket = new CorsConfiguration();
+        configurationWebSocket.setAllowedOrigins(List.of("*"));
+        configurationWebSocket.setAllowedHeaders(List.of("*"));
+        configurationWebSocket.setAllowCredentials(false);
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/ws", configurationWebSocket);
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
@@ -104,4 +113,12 @@ public class ApplicationConfig {
         JWKSource<SecurityContext> jwkSource = new ImmutableJWKSet<>(new JWKSet(jwk));
         return new NimbusJwtEncoder(jwkSource);
     }
+
+//    @Bean
+//    public AuthorizationManager<Message<?>> messageAuthorizationManager(MessageMatcherDelegatingAuthorizationManager.Builder messages) {
+//        messages
+//                .anyMessage().permitAll();
+//
+//        return messages.build();
+//    }
 }
