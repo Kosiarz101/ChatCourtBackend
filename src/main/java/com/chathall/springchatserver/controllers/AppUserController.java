@@ -1,12 +1,17 @@
 package com.chathall.springchatserver.controllers;
 
+import com.chathall.springchatserver.dtos.chatcourtfrontend.AppUserDTO;
 import com.chathall.springchatserver.dtos.chatcourtfrontend.RegisterUserDTO;
 import com.chathall.springchatserver.dtos.chatcourtfrontend.mappers.AppUserDTOMapper;
 import com.chathall.springchatserver.models.AppUser;
+import com.chathall.springchatserver.services.JWTTokenService;
 import com.chathall.springchatserver.services.mongodb.AppUserService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.UUID;
 
@@ -17,11 +22,12 @@ public class AppUserController {
 
     private final AppUserService appUserService;
     private final AppUserDTOMapper appUserDTOMapper;
+    private final JWTTokenService tokenService;
 
     @PostMapping
-    public ResponseEntity<AppUser> add(@RequestBody RegisterUserDTO appUserDTO) {
+    public ResponseEntity<AppUserDTO> add(@RequestBody RegisterUserDTO appUserDTO) {
         AppUser appUser = appUserService.add(appUserDTOMapper.fromRegisterUser(appUserDTO));
-        return ResponseEntity.status(201).body(appUser);
+        return ResponseEntity.status(201).body(appUserDTOMapper.toDTO(appUser));
     }
 
 //    @GetMapping
@@ -44,5 +50,15 @@ public class AppUserController {
     public ResponseEntity<Boolean> exists(@RequestParam(required = false) UUID id,
                                           @RequestParam(required = false) String email) {
         return ResponseEntity.ok(appUserService.exists("email", email));
+    }
+
+    @GetMapping
+    public ResponseEntity<AppUserDTO> getCurrentUser(HttpServletRequest httpServletRequest) {
+        String jwt = tokenService.getJwtFromCookie(httpServletRequest);
+        String email = tokenService.getEmailFromJWTToken(jwt);
+        AppUser appUser = appUserService.getByEmail(email).orElseThrow(
+                () -> new ResponseStatusException(HttpStatusCode.valueOf(404), "User with this email doesn't exist")
+        );
+        return ResponseEntity.ok(appUserDTOMapper.toDTO(appUser));
     }
 }

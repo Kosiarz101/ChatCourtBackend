@@ -1,6 +1,7 @@
 package com.chathall.springchatserver.config;
 
 import com.chathall.springchatserver.filters.JWTAuthenticationFilter;
+import com.chathall.springchatserver.services.JWTTokenService;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.OctetSequenceKey;
@@ -62,7 +63,7 @@ public class ApplicationConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, JWTTokenService tokenService) throws Exception {
         http.cors(c -> corsConfigurationSource())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests((requests) ->
@@ -74,13 +75,13 @@ public class ApplicationConfig {
                 )
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2ResourceServer(c -> c.jwt(Customizer.withDefaults()));
-        http.addFilterBefore(getJWTAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(getJWTAuthenticationFilter(tokenService), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
     @Bean
-    public JWTAuthenticationFilter getJWTAuthenticationFilter() {
-        return new JWTAuthenticationFilter();
+    public JWTAuthenticationFilter getJWTAuthenticationFilter(JWTTokenService tokenService) {
+        return new JWTAuthenticationFilter(tokenService);
     }
 
     @Bean

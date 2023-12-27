@@ -35,6 +35,8 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     @Value(value = "${jwt.cookie.name}")
     private String AUTHORIZATION_HEADER;
+    @Value(value = "${jwt.cookie.length}")
+    private Integer cookieLength;
 
     @PostMapping("/login")
     public ResponseEntity<AppUserDTO> token(@RequestBody LoginRequestDTO loginRequestDTO, HttpServletResponse response) {
@@ -57,6 +59,7 @@ public class AuthController {
         cookie.setSecure(true);
         cookie.setAttribute("SameSite", "None");
         cookie.setPath("/");
+        cookie.setMaxAge(cookieLength);
         response.addCookie(cookie);
     }
 
