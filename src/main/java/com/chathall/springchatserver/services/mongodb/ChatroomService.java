@@ -22,7 +22,7 @@ public class ChatroomService {
     private final MongoTemplate mongoTemplate;
     private final int DEFAULT_CHATROOM_SIZE = 10;
 
-    public void add(Chatroom chatroom) {
+    public Chatroom add(Chatroom chatroom) {
         if (chatroomRepository.existsById(chatroom.getId())) {
             throw new ResponseStatusException(HttpStatusCode.valueOf(400), "Resource with given id already exists");
         }
@@ -31,7 +31,7 @@ public class ChatroomService {
         }
         chatroom.setNewId();
         chatroom.setCreationDate(LocalDateTime.now());
-        chatroomRepository.save(chatroom);
+        return chatroomRepository.save(chatroom);
     }
 
     public Optional<Chatroom> getById(UUID id) {

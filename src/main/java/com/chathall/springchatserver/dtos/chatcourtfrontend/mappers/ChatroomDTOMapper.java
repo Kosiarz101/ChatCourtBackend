@@ -6,8 +6,8 @@ import org.mapstruct.Mapper;
 
 import java.util.stream.Collectors;
 
-@Mapper(imports = Collectors.class, uses= { MessageDTOMapper.class })
+@Mapper(imports = Collectors.class, uses= { MessageDTOMapper.class, CategoryDTOMapper.class })
 public interface ChatroomDTOMapper {
-
     ChatroomDTO toDTO(Chatroom chatroom);
+    Chatroom toEntity(ChatroomDTO chatroomDTO);
 }

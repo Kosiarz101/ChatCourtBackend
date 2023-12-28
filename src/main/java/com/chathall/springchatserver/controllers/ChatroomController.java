@@ -18,9 +18,9 @@ public class ChatroomController {
     private final ChatroomDTOMapper chatroomDTOMapper;
 
     @PostMapping
-    public ResponseEntity<Chatroom> add(@RequestBody Chatroom chatroom) {
-        chatroomService.add(chatroom);
-        return ResponseEntity.status(201).body(chatroomService.getById(chatroom.getId()).get());
+    public ResponseEntity<ChatroomDTO> add(@RequestBody ChatroomDTO chatroomDTO) {
+        Chatroom chatroom = chatroomService.add(chatroomDTOMapper.toEntity(chatroomDTO));
+        return ResponseEntity.status(201).body(chatroomDTOMapper.toDTO(chatroom));
     }
 
     @GetMapping
