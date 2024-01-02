@@ -1,5 +1,6 @@
 package com.chathall.springchatserver.services.mongodb;
 
+import com.chathall.springchatserver.models.Category;
 import com.chathall.springchatserver.models.Chatroom;
 import com.chathall.springchatserver.repositories.ChatroomRepository;
 import lombok.RequiredArgsConstructor;
@@ -7,6 +8,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -20,7 +22,7 @@ public class ChatroomService {
 
     private final ChatroomRepository chatroomRepository;
     private final MongoTemplate mongoTemplate;
-    private final int DEFAULT_CHATROOM_SIZE = 10;
+    private final int DEFAULT_CHATROOM_SIZE = 5;
 
     public Chatroom add(Chatroom chatroom) {
         if (chatroomRepository.existsById(chatroom.getId())) {
@@ -36,6 +38,18 @@ public class ChatroomService {
 
     public Optional<Chatroom> getById(UUID id) {
         return chatroomRepository.findById(id);
+    }
+
+    public Slice<Chatroom> findByNameAndCategoryId(String name, String categoryId, int page, @Nullable Integer size) {
+        int pageSize = size == null ? DEFAULT_CHATROOM_SIZE : size;
+        Category category = new Category();
+        category.setId(UUID.fromString(categoryId));
+        return chatroomRepository.findAllByNameAndCategoryIgnoreCase(name, category, PageRequest.of(page, pageSize));
+    }
+
+    public Slice<Chatroom> findByNameContains(String name, int page, @Nullable Integer size) {
+        int pageSize = size == null ? DEFAULT_CHATROOM_SIZE : size;
+        return chatroomRepository.findAllByNameContainsIgnoreCase(name, PageRequest.of(page, pageSize));
     }
 
     public Slice<Chatroom> getAllPageable(int page) {

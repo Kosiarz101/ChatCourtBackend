@@ -16,9 +16,12 @@ import java.util.Set;
 public class Chatroom extends BaseModel {
 
     private String name;
+    private String description;
     private boolean isPublic = true;
     @DocumentReference
     private Category category;
+    @DocumentReference
+    private Set<AppUser> users;
     @ReadOnlyProperty
     @DocumentReference(lookup = "{ 'chatroom':?#{#self._id} }")
     private Set<Message> messages;

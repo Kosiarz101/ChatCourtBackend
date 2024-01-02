@@ -24,11 +24,11 @@ public class AppUser extends BaseModel implements UserDetails {
     private String email;
     private String password;
     private String username;
+    @DocumentReference
+    private Set<Chatroom> chatrooms;
     @ReadOnlyProperty
     @DocumentReference(lookup = "{ 'appUser':?#{#self._id} }")
     private Set<Message> messages;
-    @DocumentReference
-    private Set<Chatroom> chatrooms;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

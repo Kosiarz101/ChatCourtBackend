@@ -36,4 +36,29 @@ public class ChatroomController {
         Slice<ChatroomDTO> results = chatrooms.map(chatroomDTOMapper::toDTO);
         return ResponseEntity.ok(results);
     }
+
+    @GetMapping(params = {"chatroomName", "categoryId"})
+    public ResponseEntity<Slice<ChatroomDTO>> findByNameAndCategoryId(@RequestParam("chatroomName") String chatroomName,
+                                                                     @RequestParam("categoryId") String categoryId,
+                                                                     @RequestParam(required = false) Integer page,
+                                                                     @RequestParam(required = false) Integer size) {
+        Slice<Chatroom> chatrooms;
+        if (page == null)
+            page = 0;
+        chatrooms = chatroomService.findByNameAndCategoryId(chatroomName, categoryId, page, size);
+        Slice<ChatroomDTO> results = chatrooms.map(chatroomDTOMapper::toDTO);
+        return ResponseEntity.ok(results);
+    }
+
+    @GetMapping(params = {"chatroomName"})
+    public ResponseEntity<Slice<ChatroomDTO>> findByNameAndCategoryId(@RequestParam("chatroomName") String chatroomName,
+                                                                      @RequestParam(required = false) Integer page,
+                                                                      @RequestParam(required = false) Integer size) {
+        Slice<Chatroom> chatrooms;
+        if (page == null)
+            page = 0;
+        chatrooms = chatroomService.findByNameContains(chatroomName, page, size);
+        Slice<ChatroomDTO> results = chatrooms.map(chatroomDTOMapper::toDTO);
+        return ResponseEntity.ok(results);
+    }
 }

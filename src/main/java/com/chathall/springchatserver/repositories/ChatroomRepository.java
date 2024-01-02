@@ -1,5 +1,6 @@
 package com.chathall.springchatserver.repositories;
 
+import com.chathall.springchatserver.models.Category;
 import com.chathall.springchatserver.models.Chatroom;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -15,6 +16,8 @@ public interface ChatroomRepository extends MongoRepository<Chatroom, UUID> {
 
     List<Chatroom> findAllByOrderByCreationDateDesc();
     Slice<Chatroom> findAllByOrderByCreationDateDesc(Pageable pageable);
+    Slice<Chatroom> findAllByNameAndCategoryIgnoreCase(String name, Category category, Pageable pageable);
+    Slice<Chatroom> findAllByNameContainsIgnoreCase(String name, Pageable pageable);
     Optional<Chatroom> findByName(String name);
     boolean existsByName(String name);
 }
