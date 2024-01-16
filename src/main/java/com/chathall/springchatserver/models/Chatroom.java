@@ -20,9 +20,8 @@ public class Chatroom extends BaseModel {
     private boolean isPublic = true;
     @DocumentReference
     private Category category;
-    @DocumentReference
-    private Set<AppUser> users;
     @ReadOnlyProperty
-    @DocumentReference(lookup = "{ 'chatroom':?#{#self._id} }")
+    private Set<ChatroomUser> users;
+    @ReadOnlyProperty
     private Set<Message> messages;
 }

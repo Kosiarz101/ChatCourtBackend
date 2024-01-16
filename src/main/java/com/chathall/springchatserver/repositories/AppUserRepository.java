@@ -10,6 +10,6 @@ import java.util.UUID;
 @Repository
 public interface AppUserRepository extends MongoRepository<AppUser, UUID> {
 
-    Optional<AppUser> findByEmail(String name);
+    Optional<AppUser> findByEmailIgnoreCase(String name);
     boolean existsByEmail(String name);
 }
