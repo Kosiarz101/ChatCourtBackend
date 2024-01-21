@@ -6,7 +6,6 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.springframework.data.annotation.ReadOnlyProperty;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.DocumentReference;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -25,10 +24,8 @@ public class AppUser extends BaseModel implements UserDetails {
     private String password;
     private String username;
     @ReadOnlyProperty
-    @DocumentReference(lookup = "{ 'appUser':?#{#self._id} }")
+    //@DocumentReference(lookup = "{ 'appUser':?#{#self._id} }")
     private Set<Message> messages;
-    @DocumentReference
-    private Set<Chatroom> chatrooms;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

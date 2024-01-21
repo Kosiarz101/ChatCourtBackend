@@ -35,7 +35,7 @@ public class MessageController {
     @MessageMapping("/message/add")
     public void createStomp(@Payload MessageDTO messageDTO) {
         Message message = messageDTOMapper.toEntity(messageDTO);
-        //message = messageService.add(message);
+        message = messageService.add(message);
         simpMessagingTemplate.convertAndSend("/topic/public/" + message.getChatroom().getId(),
                 ResponseEntity.status(201).body(messageDTOMapper.toDTO(message)));
     }

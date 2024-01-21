@@ -38,7 +38,7 @@ public class AppUserService implements UserDetailsService {
     }
 
     public Optional<AppUser> getByEmail(String email) {
-        return appUserRepository.findByEmail(email);
+        return appUserRepository.findByEmailIgnoreCase(email);
     }
 
     public Slice<AppUser> getBy(Map<String, Object> parameters, Integer page, Integer size) {
@@ -60,7 +60,7 @@ public class AppUserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Optional<AppUser> appUser = appUserRepository.findByEmail(email);
+        Optional<AppUser> appUser = appUserRepository.findByEmailIgnoreCase(email);
         if (appUser.isEmpty())
             throw new UsernameNotFoundException(email);
         return appUser.get();
