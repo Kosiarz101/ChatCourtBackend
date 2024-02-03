@@ -7,6 +7,6 @@ import lombok.experimental.Accessors;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class CategoryDTO extends BaseDTO {
+public class CategoryDTO extends BaseDTOModel {
     private String name;
 }

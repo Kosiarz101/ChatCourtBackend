@@ -10,7 +10,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class BaseDTO {
+public class BaseDTOModel {
 
     private UUID id = UUID.randomUUID();
     private LocalDateTime creationDate;

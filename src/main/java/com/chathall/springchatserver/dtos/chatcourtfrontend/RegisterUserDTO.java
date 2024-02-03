@@ -7,7 +7,7 @@ import lombok.experimental.Accessors;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class RegisterUserDTO extends BaseDTO {
+public class RegisterUserDTO extends BaseDTOModel {
     private String email;
     private String password;
     private String username;

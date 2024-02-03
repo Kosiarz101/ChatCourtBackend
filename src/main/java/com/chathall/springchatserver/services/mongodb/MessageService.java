@@ -3,30 +3,57 @@ package com.chathall.springchatserver.services.mongodb;
 import com.chathall.springchatserver.models.Message;
 import com.chathall.springchatserver.repositories.MessageRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class MessageService {
-
+    public static final int DEFAULT_MESSAGE_SIZE = 5;
     private final MessageRepository messageRepository;
-    private final int DEFAULT_MESSAGE_SIZE = 20;
 
     public Message add(Message message) {
         message.setNewId();
-        message.setCreationDate(LocalDateTime.now());
+        LocalDateTime now = LocalDateTime.now();
+        message.setCreationDate(now);
+        message.setLastModifiedDate(now);
         return messageRepository.save(message);
     }
 
-    public Slice<Message> getByChatroomIdPageable(UUID chatroomId, Integer page, Integer size) {
-        return messageRepository.findAllByChatroomIdOrderByCreationDate(
-                chatroomId, PageRequest.of(setPage(page), setSize(size))
-        );
+    public Slice<Message> getByChatroomIdAndDateBefore(UUID chatroomId, LocalDateTime startDate, Integer size) {
+        size = setSize(size);
+        List<Message> messagesFromDB = messageRepository
+                .findByChatroomIdAndStartDateBeforeOrderByCreationDateDesc(chatroomId, startDate, size + 1);
+        boolean hasNext = messagesFromDB.size() > size;
+        List<Message> messages;
+        if (hasNext) {
+            // list is unmodifiable so it must be cloned
+            messages = new ArrayList<>(messagesFromDB);
+            messages.remove(messages.size() - 1);
+        } else
+            messages = messagesFromDB;
+        return new SliceImpl<>(messages, Pageable.unpaged(), hasNext);
+    }
+
+    public void updateMessage(Message message) {
+        message.setLastModifiedDate(LocalDateTime.now());
+        messageRepository.save(message);
+    }
+
+    public void deleteMessage(UUID id) {
+        messageRepository.deleteById(id);
+    }
+
+    public Optional<Message> getById(UUID id) {
+        return messageRepository.findById(id);
     }
 
     private int setSize(Integer size) {

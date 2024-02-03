@@ -1,21 +1,25 @@
 package com.chathall.springchatserver.services.mongodb;
 
-import com.chathall.springchatserver.dtos.chatcourtfrontend.ChatroomSearchDTO;
-import com.chathall.springchatserver.dtos.chatcourtfrontend.ChatroomUserFlatDTO;
-import com.chathall.springchatserver.models.AppUser;
 import com.chathall.springchatserver.models.Chatroom;
+import com.chathall.springchatserver.models.ChatroomChatPanel;
+import com.chathall.springchatserver.models.ChatroomSearch;
 import com.chathall.springchatserver.repositories.ChatroomRepository;
 import com.chathall.springchatserver.repositories.ChatroomUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.*;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -42,33 +46,93 @@ public class ChatroomService {
         return chatroomRepository.findById(id);
     }
 
-    public Slice<Chatroom> findByUserIdPageable(UUID chatroomUserId, boolean includeMessages, int page, @Nullable Integer size) {
-        size = size == null ? DEFAULT_CHATROOM_SIZE : size;
-        AppUser appUser = new AppUser();
-        appUser.setId(chatroomUserId);
-        Slice<ChatroomUserFlatDTO> chatroomUsers = chatroomUserRepository.findByUser(appUser, PageRequest.of(page, size));
-        List<UUID> chatroomIds = chatroomUsers.getContent().stream().map(ChatroomUserFlatDTO::getChatroom).toList();
+    public Optional<ChatroomChatPanel> getById(UUID id, boolean includeMessages, boolean includeChatroomUsers) {
+        AggregationOperation match = new MatchOperation(Criteria.where("_id").is(id));
+        List<AggregationOperation> pipeline = new ArrayList<>(List.of(match, createCategoryLookup(), createCategoryUnwind()));
+
         if (includeMessages)
-            return chatroomRepository.findAllByIdsOrderByCreationDateDescWithMessages(chatroomIds, PageRequest.of(page, size));
-        else
-            return chatroomRepository.findAllByOrderByCreationDateDesc(PageRequest.of(page, size));
+            pipeline.add(createMessagesLookup());
+        if(includeChatroomUsers)
+            pipeline.add(createChatroomUsersLookup());
+        Aggregation agg = Aggregation.newAggregation(pipeline);
+
+        AggregationResults<ChatroomChatPanel> results = mongoTemplate.aggregate(agg, "chatroom", ChatroomChatPanel.class);
+        if (results.getMappedResults().size() == 0)
+            return Optional.empty();
+        return Optional.of(results.getMappedResults().get(0));
     }
 
-    public Slice<ChatroomSearchDTO> findByNameAndCategoryId(String name, UUID categoryId, int page, @Nullable Integer size) {
+//    public Slice<Chatroom> findByUserIdPageable(UUID chatroomUserId, boolean includeMessages, int page, @Nullable Integer size) {
+//        size = size == null ? DEFAULT_CHATROOM_SIZE : size;
+//        Slice<UUID> chatroomUsers = chatroomUserRepository.findChatroomIdsByUserId(chatroomUserId, PageRequest.of(page, size));
+//        List<UUID> chatroomIds = chatroomUsers.getContent().stream().toList();
+//        if (includeMessages)
+//            return chatroomRepository.findAllByIdsOrderByCreationDateDescWithMessages(chatroomIds, MessageService.DEFAULT_MESSAGE_SIZE, PageRequest.of(page, size));
+//        else
+//            return chatroomRepository.findAllByOrderByCreationDateDesc(PageRequest.of(page, size));
+//    }
+
+    public Slice<ChatroomChatPanel> findByUserIdPageable(UUID chatroomUserId, boolean includeMessages, boolean includeChatroomUsers, int page, @Nullable Integer size) {
+        size = size == null ? DEFAULT_CHATROOM_SIZE : size;
+        Slice<UUID> chatroomUsers = chatroomUserRepository.findChatroomIdsByUserId(chatroomUserId, PageRequest.of(page, size + 1));
+        List<UUID> chatroomIds = chatroomUsers.getContent().stream().toList();
+
+        Criteria criteria = Criteria.where("_id").in(chatroomIds);
+        AggregationOperation match = new MatchOperation(criteria);
+        AggregationOperation sort = new SortOperation(Sort.by(Sort.Direction.DESC, "creationDate"));
+        List<AggregationOperation> pipeline = new ArrayList<>(List.of(match, sort, createCategoryLookup(), createCategoryUnwind()));
+
+        if (includeMessages)
+            pipeline.add(createMessagesLookup());
+        if(includeChatroomUsers)
+            pipeline.add(createChatroomUsersLookup());
+        Aggregation agg = Aggregation.newAggregation(pipeline);
+
+        AggregationResults<ChatroomChatPanel> aggregationResults = mongoTemplate.aggregate(agg, "chatroom", ChatroomChatPanel.class);
+        List<ChatroomChatPanel> results = aggregationResults.getMappedResults();
+
+        boolean hasNext = results.size() > size;
+        if (hasNext) {
+            results = new ArrayList<>(results);
+            results.remove(results.size() - 1);
+        }
+        return new SliceImpl<>(results, PageRequest.of(page, size), hasNext);
+    }
+
+    public Slice<ChatroomSearch> findByNameAndCategoryId(String name, UUID categoryId, int page, @Nullable Integer size) {
         int pageSize = size == null ? DEFAULT_CHATROOM_SIZE : size;
         return chatroomRepository.findAllPublicByNameAndCategory(name, categoryId, PageRequest.of(page, pageSize));
     }
 
-    public Slice<ChatroomSearchDTO> findByNameContains(String name, int page, @Nullable Integer size) {
+    public Slice<ChatroomSearch> findByNameContains(String name, int page, @Nullable Integer size) {
         int pageSize = size == null ? DEFAULT_CHATROOM_SIZE : size;
         return chatroomRepository.findAllPublicByName(name, PageRequest.of(page, pageSize));
     }
 
-//    public Slice<Chatroom> getAllPageable(int test, int page, int size) {
-//        Query query = new Query();
-//        query.limit(DEFAULT_CHATROOM_SIZE);
-//        query.fields().include("messages").slice("messages", 1);
-//        List<Chatroom> chatrooms = mongoTemplate.find(query, Chatroom.class);
-//        return new SliceImpl<Chatroom>(chatrooms, PageRequest.of(0, DEFAULT_CHATROOM_SIZE), chatrooms.size() == 20);
-//    }
+    private AggregationOperation createMessagesLookup() {
+        AggregationOperation sort = new SortOperation(Sort.by(Sort.Direction.DESC, "creationDate"));
+        AggregationOperation messagesLimit = new LimitOperation(DEFAULT_CHATROOM_SIZE);
+        AggregationPipeline aggPipeline = new AggregationPipeline();
+        aggPipeline.add(sort);
+        aggPipeline.add(messagesLimit);
+        return new LookupOperation("message", Fields.field("_id"), Fields.field("chatroom"),
+                null, aggPipeline, Fields.field("messages"));
+    }
+
+    private AggregationOperation createChatroomUsersLookup() {
+        AggregationOperation sort = new SortOperation(Sort.by(Sort.Direction.DESC, "creationDate"));
+        AggregationPipeline aggPipeline = new AggregationPipeline();
+        aggPipeline.add(sort);
+        return new LookupOperation("chatroomUser", Fields.field("_id"), Fields.field("chatroom"),
+                null, aggPipeline, Fields.field("users"));
+    }
+
+    private AggregationOperation createCategoryLookup() {
+        return new LookupOperation(Fields.field("category"), Fields.field("category"), Fields.field("_id"),
+                Fields.field("category"));
+    }
+
+    private AggregationOperation createCategoryUnwind() {
+        return new UnwindOperation(Fields.field("category"));
+    }
 }

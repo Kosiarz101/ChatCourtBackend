@@ -9,7 +9,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class MessageDTO extends BaseDTO {
+public class MessageDTO extends BaseDTOModel {
 
     private String content;
     private UUID authorId;
