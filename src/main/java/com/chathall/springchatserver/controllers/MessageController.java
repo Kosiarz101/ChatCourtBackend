@@ -45,7 +45,7 @@ public class MessageController {
         Message message = messageDTOMapper.toEntity(messageDTO);
         messageService.updateMessage(message);
         simpMessagingTemplate.convertAndSend(stompDestination + "/message/update/" + message.getChatroom().getId(),
-                ResponseEntity.status(201).body(messageDTOMapper.toDTO(message)));
+                ResponseEntity.status(200).body(messageDTOMapper.toDTO(message)));
     }
 
     @GetMapping
@@ -65,7 +65,7 @@ public class MessageController {
             new ResponseStatusException(HttpStatusCode.valueOf(404), "Message with id=" + id.toString() + " doesn't exist")
         );
         messageService.deleteMessage(id);
-        simpMessagingTemplate.convertAndSend("/topic/public/" + message.getChatroom().getId(),
-                ResponseEntity.status(201).body(messageDTOMapper.toDTO(message)));
+        simpMessagingTemplate.convertAndSend(stompDestination + "/message/delete/" + message.getChatroom().getId(),
+                ResponseEntity.status(204).body(messageDTOMapper.toDTO(message)));
     }
 }

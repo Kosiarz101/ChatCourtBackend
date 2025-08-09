@@ -57,9 +57,9 @@ public class ChatroomService {
         Aggregation agg = Aggregation.newAggregation(pipeline);
 
         AggregationResults<ChatroomChatPanel> results = mongoTemplate.aggregate(agg, "chatroom", ChatroomChatPanel.class);
-        if (results.getMappedResults().size() == 0)
+        if (results.getMappedResults().isEmpty())
             return Optional.empty();
-        return Optional.of(results.getMappedResults().get(0));
+        return Optional.of(results.getMappedResults().getFirst());
     }
 
 //    public Slice<Chatroom> findByUserIdPageable(UUID chatroomUserId, boolean includeMessages, int page, @Nullable Integer size) {
@@ -94,7 +94,7 @@ public class ChatroomService {
         boolean hasNext = results.size() > size;
         if (hasNext) {
             results = new ArrayList<>(results);
-            results.remove(results.size() - 1);
+            results.removeLast();
         }
         return new SliceImpl<>(results, PageRequest.of(page, size), hasNext);
     }

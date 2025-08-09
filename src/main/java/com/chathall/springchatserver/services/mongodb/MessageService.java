@@ -37,7 +37,7 @@ public class MessageService {
         if (hasNext) {
             // list is unmodifiable so it must be cloned
             messages = new ArrayList<>(messagesFromDB);
-            messages.remove(messages.size() - 1);
+            messages.removeLast();
         } else
             messages = messagesFromDB;
         return new SliceImpl<>(messages, Pageable.unpaged(), hasNext);

@@ -38,8 +38,8 @@ public class ChatroomUserService {
         AggregationResults<ChatroomUser> aggregationResults = mongoTemplate.aggregate(Aggregation.newAggregation(List.of(match)),
                 "chatroomUser", ChatroomUser.class);
         List<ChatroomUser> results = aggregationResults.getMappedResults();
-        if (results.size() == 0)
+        if (results.isEmpty())
             return Optional.empty();
-        return Optional.of(results.get(0));
+        return Optional.of(results.getFirst());
     }
 }
