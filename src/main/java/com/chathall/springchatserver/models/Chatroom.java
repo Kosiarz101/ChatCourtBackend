@@ -14,7 +14,6 @@ import java.util.Set;
 @Accessors(chain = true)
 @Document
 public class Chatroom extends BaseModel {
-
     private String name;
     private String description;
     private boolean isPublic = true;

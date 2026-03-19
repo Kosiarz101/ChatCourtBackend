@@ -1,4 +1,4 @@
-package com.chathall.springchatserver.dtos.chatcourtfrontend;
+package com.chathall.springchatserver.dtos.frontend.response;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -10,8 +10,8 @@ import java.util.UUID;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class BaseDTOModel {
-
-    private UUID id = UUID.randomUUID();
+public class BaseEntityDTO {
+    private UUID id;
     private LocalDateTime creationDate;
+    private LocalDateTime lastModifiedDate;
 }

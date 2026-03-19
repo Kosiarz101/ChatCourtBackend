@@ -14,14 +14,15 @@ import java.util.UUID;
 @Repository
 public interface ChatroomRepository extends MongoRepository<Chatroom, UUID> {
 
-    List<Chatroom> findAllByOrderByCreationDateDesc();
+    Slice<Chatroom> findAllByOrderByCreationDateDesc(Pageable pageable);
+
     @Aggregation(pipeline = {
             "{$match: {\"_id\": { $in: ?0 } } }",
             "{$sort: {\"creationDate\": -1}}",
             "{$lookup: { from: \"message\", localField: \"_id\", foreignField: \"chatroom\", as: \"messages\", pipeline: [{$sort: { 'creationDate': -1 }}, { $limit: ?1 } ] }}",
     })
     Slice<Chatroom> findAllByIdsOrderByCreationDateDescWithMessages(List<UUID> chatroomIds, int numberOfMessages, Pageable pageable);
-    Slice<Chatroom> findAllByOrderByCreationDateDesc(Pageable pageable);
+
     @Aggregation(pipeline =  {
             " {'$match': { $and: [{ name: {'$regex': /?0/, $options: 'i' } }, { 'category': ?1 }, { isPublic: true }] } }",
             " {'$lookup': { 'from': 'category', 'localField': 'category', 'foreignField': '_id', 'as': 'category' }}",
@@ -35,6 +36,7 @@ public interface ChatroomRepository extends MongoRepository<Chatroom, UUID> {
             }}"""
     })
     Slice<ChatroomSearch> findAllPublicByNameAndCategory(String name, UUID categoryId, Pageable pageable);
+
     @Aggregation(pipeline =  {
             " {'$match': { $and: [{ name: {'$regex': /?0/, $options: 'i' } }] } }",
             " {'$lookup': { 'from': 'category', 'localField': 'category', 'foreignField': '_id', 'as': 'category' }}",
@@ -48,6 +50,8 @@ public interface ChatroomRepository extends MongoRepository<Chatroom, UUID> {
             }}"""
     })
     Slice<ChatroomSearch> findAllPublicByName(String name, Pageable pageable);
+
     Slice<Chatroom> findAllByNameContainsIgnoreCaseAndIsPublicTrue(String name, Pageable pageable);
+
     boolean existsByName(String name);
 }

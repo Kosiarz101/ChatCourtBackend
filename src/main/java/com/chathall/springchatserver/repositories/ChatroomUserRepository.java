@@ -1,6 +1,5 @@
 package com.chathall.springchatserver.repositories;
 
-import com.chathall.springchatserver.dtos.chatcourtfrontend.ChatroomUserFlatDTO;
 import com.chathall.springchatserver.models.AppUser;
 import com.chathall.springchatserver.models.Chatroom;
 import com.chathall.springchatserver.models.ChatroomUser;
@@ -15,7 +14,6 @@ import java.util.UUID;
 @Repository
 public interface ChatroomUserRepository extends MongoRepository<ChatroomUser, UUID> {
     boolean existsByUserAndChatroom(AppUser user, Chatroom chatroom);
-    Slice<ChatroomUserFlatDTO> findChatroomIdsByUserId(AppUser user, Pageable pageable);
     @Aggregation(pipeline = {
             "{$match: {'user': ?0 } }",
             "{$project: {'chatroom': 1}}",

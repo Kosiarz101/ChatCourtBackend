@@ -2,13 +2,13 @@ package com.chathall.springchatserver.services.mongodb;
 
 import com.chathall.springchatserver.models.AppUser;
 import com.chathall.springchatserver.repositories.AppUserRepository;
+import com.chathall.springchatserver.services.db.AppUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,9 +18,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-@RequiredArgsConstructor
 @Service
-public class AppUserService implements UserDetailsService {
+@RequiredArgsConstructor
+public class AppUserMongoService implements AppUserService {
 
     private final PasswordEncoder passwordEncoder;
     private final AppUserRepository appUserRepository;
@@ -28,7 +28,9 @@ public class AppUserService implements UserDetailsService {
 
     public AppUser add(AppUser appUser) {
         appUser.setNewId();
-        appUser.setCreationDate(LocalDateTime.now());
+        LocalDateTime now = LocalDateTime.now();
+        appUser.setCreationDate(now);
+        appUser.setLastModifiedDate(now);
         appUser.setPassword(passwordEncoder.encode(appUser.getPassword()));
         return appUserRepository.save(appUser);
     }

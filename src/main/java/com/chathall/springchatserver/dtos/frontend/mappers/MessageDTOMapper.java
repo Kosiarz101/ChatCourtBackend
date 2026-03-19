@@ -1,10 +1,8 @@
-package com.chathall.springchatserver.dtos.chatcourtfrontend.mappers;
+package com.chathall.springchatserver.dtos.frontend.mappers;
 
-import com.chathall.springchatserver.dtos.chatcourtfrontend.MessageDTO;
-import com.chathall.springchatserver.models.AppUser;
-import com.chathall.springchatserver.models.BaseModel;
-import com.chathall.springchatserver.models.Chatroom;
-import com.chathall.springchatserver.models.Message;
+import com.chathall.springchatserver.dtos.frontend.request.MessageRequestDTO;
+import com.chathall.springchatserver.dtos.frontend.response.MessageResponseDTO;
+import com.chathall.springchatserver.models.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
@@ -12,20 +10,19 @@ import org.mapstruct.Named;
 
 import java.util.UUID;
 
-@Mapper
+@Mapper(uses = {ChatroomUserDTOMapper.class})
 public interface MessageDTOMapper {
 
     @Mappings({
-            @Mapping(target = "authorId", source = "author", qualifiedByName = "resourceId"),
             @Mapping(target = "chatroomId", source = "chatroom", qualifiedByName = "resourceId")
     })
-    MessageDTO toDTO(Message message);
+    MessageResponseDTO toDTO(Message message);
 
     @Mappings({
             @Mapping(target = "author", source = "authorId", qualifiedByName = "authorEntity"),
             @Mapping(target = "chatroom", source = "chatroomId", qualifiedByName = "chatroomEntity")
     })
-    Message toEntity(MessageDTO messageDTO);
+    Message toEntity(MessageRequestDTO messageRequestDTO);
 
     @Named("resourceId")
     default UUID setResourceId(BaseModel resource) {
@@ -43,11 +40,11 @@ public interface MessageDTOMapper {
     }
 
     @Named("authorEntity")
-    default AppUser setAuthor(UUID authorId) {
+    default ChatroomUser setAuthor(UUID authorId) {
         if (authorId != null) {
-            AppUser appUser = new AppUser();
-            appUser.setId(authorId);
-            return appUser;
+            ChatroomUser chatroomUser = new ChatroomUser();
+            chatroomUser.setId(authorId);
+            return chatroomUser;
         } else
             return null;
     }

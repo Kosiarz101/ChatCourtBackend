@@ -1,9 +1,10 @@
 package com.chathall.springchatserver.controllers;
 
-import com.chathall.springchatserver.dtos.chatcourtfrontend.ChatroomUserDTO;
-import com.chathall.springchatserver.dtos.chatcourtfrontend.mappers.ChatroomUserDTOMapper;
+import com.chathall.springchatserver.dtos.frontend.mappers.ChatroomUserDTOMapper;
+import com.chathall.springchatserver.dtos.frontend.request.ChatroomUserRequestDTO;
+import com.chathall.springchatserver.dtos.frontend.response.ChatroomUserSimpleResponseDTO;
 import com.chathall.springchatserver.models.ChatroomUser;
-import com.chathall.springchatserver.services.mongodb.ChatroomUserService;
+import com.chathall.springchatserver.services.db.ChatroomUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -21,27 +22,28 @@ public class ChatroomUserController {
     private final ChatroomUserService chatroomUserService;
     private final ChatroomUserDTOMapper chatroomUserDTOMapper;
     private final SimpMessagingTemplate simpMessagingTemplate;
+
     @Value("${client.stomp.destination}")
     private String stompDestination;
 
     @PostMapping
-    public ResponseEntity<ChatroomUserDTO> add(@RequestBody ChatroomUserDTO chatroomUserDTO) {
-        ChatroomUser chatroomUser = toEntity(chatroomUserDTO);
+    public ResponseEntity<ChatroomUserSimpleResponseDTO> add(@RequestBody ChatroomUserRequestDTO chatroomUserRequestDTO) {
+        ChatroomUser chatroomUser = toEntity(chatroomUserRequestDTO);
         chatroomUserService.add(chatroomUser);
         chatroomUser = chatroomUserService.getById(chatroomUser.getId()).orElse(null);
-        ChatroomUserDTO chatroomUserDTOFromDB = toDTO(chatroomUser);
+        ChatroomUserSimpleResponseDTO chatroomUserResponseDTOFromDB = toDTO(chatroomUser);
         simpMessagingTemplate.convertAndSend(
-                stompDestination + "/chatroom-user/add/" + chatroomUserDTOFromDB.getChatroom().getId(),
-                ResponseEntity.status(201).body(chatroomUserDTOFromDB)
+                stompDestination + "/chatroom-user/add/" + chatroomUserResponseDTOFromDB.getChatroomId(),
+                ResponseEntity.status(201).body(chatroomUserResponseDTOFromDB)
         );
-        return ResponseEntity.status(201).body(chatroomUserDTOFromDB);
+        return ResponseEntity.status(201).body(chatroomUserResponseDTOFromDB);
     }
 
-    private ChatroomUserDTO toDTO(ChatroomUser chatroomUser) {
+    private ChatroomUserSimpleResponseDTO toDTO(ChatroomUser chatroomUser) {
         return chatroomUserDTOMapper.toDTO(chatroomUser);
     }
 
-    private ChatroomUser toEntity(ChatroomUserDTO dto) {
+    private ChatroomUser toEntity(ChatroomUserRequestDTO dto) {
         return chatroomUserDTOMapper.toEntity(dto);
     }
 }

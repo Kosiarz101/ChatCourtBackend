@@ -1,7 +1,7 @@
-package com.chathall.springchatserver.dtos.chatcourtfrontend.mappers;
+package com.chathall.springchatserver.dtos.frontend.mappers;
 
-import com.chathall.springchatserver.dtos.chatcourtfrontend.AppUserDTO;
-import com.chathall.springchatserver.dtos.chatcourtfrontend.RegisterUserDTO;
+import com.chathall.springchatserver.dtos.frontend.response.AppUserSimpleResponseDTO;
+import com.chathall.springchatserver.dtos.frontend.request.RegisterUserDTO;
 import com.chathall.springchatserver.models.AppUser;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -16,16 +16,14 @@ public interface AppUserDTOMapper {
     @Mappings({
             @Mapping(target = "id", source = "id"),
             @Mapping(target = "email", source = "username"),
-            @Mapping(target = "username", source = "appUserUsername"),
-            @Mapping(target = "creationDate", source = "creationDate"),
+            @Mapping(target = "username", source = "appUserUsername")
     })
-    AppUserDTO toDTO(AppUser appUser);
+    AppUserSimpleResponseDTO toDTO(AppUser appUser);
 
     @Mappings({
             @Mapping(target = "username", source = "email"),
             @Mapping(target = "appUserUsername", source = "username"),
-            @Mapping(target = "password", source = "password"),
-            @Mapping(target = "messages", expression = "java(new HashSet())")
+            @Mapping(target = "password", source = "password")
     })
     AppUser fromRegisterUser(RegisterUserDTO registerUserDTO);
 }

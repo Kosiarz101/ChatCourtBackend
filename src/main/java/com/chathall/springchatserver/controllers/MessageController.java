@@ -1,9 +1,10 @@
 package com.chathall.springchatserver.controllers;
 
-import com.chathall.springchatserver.dtos.chatcourtfrontend.MessageDTO;
-import com.chathall.springchatserver.dtos.chatcourtfrontend.mappers.MessageDTOMapper;
+import com.chathall.springchatserver.dtos.frontend.mappers.MessageDTOMapper;
+import com.chathall.springchatserver.dtos.frontend.request.MessageRequestDTO;
+import com.chathall.springchatserver.dtos.frontend.response.MessageResponseDTO;
 import com.chathall.springchatserver.models.Message;
-import com.chathall.springchatserver.services.mongodb.MessageService;
+import com.chathall.springchatserver.services.db.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Slice;
@@ -33,29 +34,29 @@ public class MessageController {
     private String stompDestination;
 
     @MessageMapping("/message/add")
-    public void createMessage(@Payload MessageDTO messageDTO) {
-        Message message = messageDTOMapper.toEntity(messageDTO);
+    public void createMessage(@Payload MessageRequestDTO messageRequestDTO) {
+        Message message = messageDTOMapper.toEntity(messageRequestDTO);
         message = messageService.add(message);
         simpMessagingTemplate.convertAndSend(stompDestination + "/message/add/" + message.getChatroom().getId(),
                 ResponseEntity.status(201).body(messageDTOMapper.toDTO(message)));
     }
 
     @MessageMapping("/message/update")
-    public void updateMessage(@Payload MessageDTO messageDTO) {
-        Message message = messageDTOMapper.toEntity(messageDTO);
+    public void updateMessage(@Payload MessageRequestDTO messageRequestDTO) {
+        Message message = messageDTOMapper.toEntity(messageRequestDTO);
         messageService.updateMessage(message);
         simpMessagingTemplate.convertAndSend(stompDestination + "/message/update/" + message.getChatroom().getId(),
                 ResponseEntity.status(200).body(messageDTOMapper.toDTO(message)));
     }
 
     @GetMapping
-    public ResponseEntity<Slice<MessageDTO>> getByChatroomIdPageable(
+    public ResponseEntity<Slice<MessageResponseDTO>> getByChatroomIdPageable(
             @RequestParam UUID chatroomId,
             @RequestParam LocalDateTime startDate,
             @RequestParam(required = false) Integer size) {
         Slice<Message> messages;
         messages = messageService.getByChatroomIdAndDateBefore(chatroomId, startDate, size);
-        Slice<MessageDTO> results = messages.map(messageDTOMapper::toDTO);
+        Slice<MessageResponseDTO> results = messages.map(messageDTOMapper::toDTO);
         return ResponseEntity.ok(results);
     }
 

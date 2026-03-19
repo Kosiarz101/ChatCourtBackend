@@ -1,4 +1,4 @@
-package com.chathall.springchatserver.dtos.chatcourtfrontend;
+package com.chathall.springchatserver.dtos.frontend.request;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -7,8 +7,7 @@ import lombok.experimental.Accessors;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class RegisterUserDTO extends BaseDTOModel {
+public class LoginRequestDTO {
     private String email;
     private String password;
-    private String username;
 }

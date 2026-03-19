@@ -8,7 +8,6 @@ import lombok.experimental.Accessors;
 @Setter
 @Accessors(chain = true)
 public class ChatroomSearch extends BaseModel {
-
     private String name;
     private String description;
     private boolean isPublic = true;

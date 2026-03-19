@@ -1,6 +1,6 @@
-package com.chathall.springchatserver.dtos.chatcourtfrontend.mappers;
+package com.chathall.springchatserver.dtos.frontend.mappers;
 
-import com.chathall.springchatserver.dtos.chatcourtfrontend.ChatroomSearchDTO;
+import com.chathall.springchatserver.dtos.frontend.response.ChatroomSearchDTO;
 import com.chathall.springchatserver.models.ChatroomSearch;
 import org.mapstruct.Mapper;
 

@@ -2,6 +2,7 @@ package com.chathall.springchatserver.services.mongodb;
 
 import com.chathall.springchatserver.models.Message;
 import com.chathall.springchatserver.repositories.MessageRepository;
+import com.chathall.springchatserver.services.db.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -16,8 +17,10 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class MessageService {
-    public static final int DEFAULT_MESSAGE_SIZE = 5;
+public class MessageMongoService implements MessageService {
+
+    private static final int DEFAULT_MESSAGE_SIZE = 5;
+
     private final MessageRepository messageRepository;
 
     public Message add(Message message) {
@@ -36,7 +39,7 @@ public class MessageService {
         List<Message> messages;
         if (hasNext) {
             // list is unmodifiable so it must be cloned
-            messages = new ArrayList<>(messagesFromDB);
+            messages = new ArrayList<>(messagesFromDB.subList(0, size));
             messages.removeLast();
         } else
             messages = messagesFromDB;
@@ -58,9 +61,5 @@ public class MessageService {
 
     private int setSize(Integer size) {
         return size == null ? DEFAULT_MESSAGE_SIZE : size;
-    }
-
-    private int setPage(Integer page) {
-        return page == null ? 0 : page;
     }
 }

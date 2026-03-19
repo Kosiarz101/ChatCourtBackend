@@ -1,4 +1,4 @@
-package com.chathall.springchatserver.dtos.chatcourtfrontend;
+package com.chathall.springchatserver.dtos.frontend.response;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -9,9 +9,8 @@ import java.util.UUID;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class MessageDTO extends BaseDTOModel {
-
+public class MessageResponseDTO extends BaseEntityDTO {
     private String content;
-    private UUID authorId;
+    private ChatroomUserSimpleResponseDTO author;
     private UUID chatroomId;
 }

@@ -4,28 +4,22 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import org.springframework.data.annotation.ReadOnlyProperty;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.Set;
 
 @Getter
 @Setter
 @Accessors(chain = true)
 @Document
 public class AppUser extends BaseModel implements UserDetails {
-
     @Setter(AccessLevel.NONE)
     @Getter(AccessLevel.NONE)
     private String email;
     private String password;
     private String username;
-    @ReadOnlyProperty
-    //@DocumentReference(lookup = "{ 'appUser':?#{#self._id} }")
-    private Set<Message> messages;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

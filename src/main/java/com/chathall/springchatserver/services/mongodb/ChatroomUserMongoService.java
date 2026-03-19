@@ -2,6 +2,7 @@ package com.chathall.springchatserver.services.mongodb;
 
 import com.chathall.springchatserver.models.ChatroomUser;
 import com.chathall.springchatserver.repositories.ChatroomUserRepository;
+import com.chathall.springchatserver.services.db.ChatroomUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -18,16 +19,18 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@RequiredArgsConstructor
 @Service
-public class ChatroomUserService {
+@RequiredArgsConstructor
+public class ChatroomUserMongoService implements ChatroomUserService {
 
     private final ChatroomUserRepository chatroomUserRepository;
     private final MongoTemplate mongoTemplate;
 
     public ChatroomUser add(ChatroomUser chatroomUser) {
         chatroomUser.setNewId();
-        chatroomUser.setCreationDate(LocalDateTime.now());
+        LocalDateTime now = LocalDateTime.now();
+        chatroomUser.setCreationDate(now);
+        chatroomUser.setLastModifiedDate(now);
         if (chatroomUserRepository.existsByUserAndChatroom(chatroomUser.getUser(), chatroomUser.getChatroom()))
             throw new ResponseStatusException(HttpStatusCode.valueOf(400), "User has been already added to this chatroom");
         return chatroomUserRepository.save(chatroomUser);

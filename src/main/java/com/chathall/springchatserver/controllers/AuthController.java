@@ -1,11 +1,11 @@
 package com.chathall.springchatserver.controllers;
 
-import com.chathall.springchatserver.dtos.chatcourtfrontend.AppUserDTO;
-import com.chathall.springchatserver.dtos.chatcourtfrontend.LoginRequestDTO;
-import com.chathall.springchatserver.dtos.chatcourtfrontend.mappers.AppUserDTOMapper;
+import com.chathall.springchatserver.dtos.frontend.response.AppUserSimpleResponseDTO;
+import com.chathall.springchatserver.dtos.frontend.request.LoginRequestDTO;
+import com.chathall.springchatserver.dtos.frontend.mappers.AppUserDTOMapper;
 import com.chathall.springchatserver.models.AppUser;
 import com.chathall.springchatserver.services.JWTTokenService;
-import com.chathall.springchatserver.services.mongodb.AppUserService;
+import com.chathall.springchatserver.services.db.AppUserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
@@ -33,13 +33,14 @@ public class AuthController {
     private final AppUserService appUserService;
     private final AppUserDTOMapper appUserDTOMapper;
     private final AuthenticationManager authenticationManager;
+
     @Value(value = "${jwt.cookie.name}")
     private String AUTHORIZATION_HEADER;
     @Value(value = "${jwt.cookie.length}")
     private Integer cookieLength;
 
     @PostMapping("/login")
-    public ResponseEntity<AppUserDTO> token(@RequestBody LoginRequestDTO loginRequestDTO, HttpServletResponse response) {
+    public ResponseEntity<AppUserSimpleResponseDTO> token(@RequestBody LoginRequestDTO loginRequestDTO, HttpServletResponse response) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequestDTO.getEmail(), loginRequestDTO.getPassword())
         );

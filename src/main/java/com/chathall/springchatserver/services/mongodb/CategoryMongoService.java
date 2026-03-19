@@ -2,6 +2,7 @@ package com.chathall.springchatserver.services.mongodb;
 
 import com.chathall.springchatserver.models.Category;
 import com.chathall.springchatserver.repositories.CategoryRepository;
+import com.chathall.springchatserver.services.db.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatusCode;
@@ -13,19 +14,18 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class CategoryService {
+public class CategoryMongoService implements CategoryService {
 
     private final CategoryRepository categoryRepository;
 
     public Category add(Category category) {
-        if (categoryRepository.existsById(category.getId())) {
-            throw new ResponseStatusException(HttpStatusCode.valueOf(400), "Resource with given id already exists");
-        }
         if (categoryRepository.existsByName(category.getName())) {
             throw new ResponseStatusException(HttpStatusCode.valueOf(400), "Resource with given name already exists");
         }
         category.setNewId();
-        category.setCreationDate(LocalDateTime.now());
+        LocalDateTime now = LocalDateTime.now();
+        category.setCreationDate(now);
+        category.setLastModifiedDate(now);
         return categoryRepository.save(category);
     }
 

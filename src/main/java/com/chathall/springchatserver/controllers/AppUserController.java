@@ -1,11 +1,11 @@
 package com.chathall.springchatserver.controllers;
 
-import com.chathall.springchatserver.dtos.chatcourtfrontend.AppUserDTO;
-import com.chathall.springchatserver.dtos.chatcourtfrontend.RegisterUserDTO;
-import com.chathall.springchatserver.dtos.chatcourtfrontend.mappers.AppUserDTOMapper;
+import com.chathall.springchatserver.dtos.frontend.response.AppUserSimpleResponseDTO;
+import com.chathall.springchatserver.dtos.frontend.request.RegisterUserDTO;
+import com.chathall.springchatserver.dtos.frontend.mappers.AppUserDTOMapper;
 import com.chathall.springchatserver.models.AppUser;
 import com.chathall.springchatserver.services.JWTTokenService;
-import com.chathall.springchatserver.services.mongodb.AppUserService;
+import com.chathall.springchatserver.services.db.AppUserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;
@@ -25,7 +25,7 @@ public class AppUserController {
     private final JWTTokenService tokenService;
 
     @PostMapping
-    public ResponseEntity<AppUserDTO> add(@RequestBody RegisterUserDTO appUserDTO) {
+    public ResponseEntity<AppUserSimpleResponseDTO> add(@RequestBody RegisterUserDTO appUserDTO) {
         AppUser appUser = appUserService.add(appUserDTOMapper.fromRegisterUser(appUserDTO));
         return ResponseEntity.status(201).body(appUserDTOMapper.toDTO(appUser));
     }
@@ -53,7 +53,7 @@ public class AppUserController {
     }
 
     @GetMapping
-    public ResponseEntity<AppUserDTO> getCurrentUser(HttpServletRequest httpServletRequest) {
+    public ResponseEntity<AppUserSimpleResponseDTO> getCurrentUser(HttpServletRequest httpServletRequest) {
         String jwt = tokenService.getJwtFromCookie(httpServletRequest);
         String email = tokenService.getEmailFromJWTToken(jwt);
         AppUser appUser = appUserService.getByEmail(email).orElseThrow(
