@@ -4,14 +4,12 @@ import com.chathall.springchatserver.models.Message;
 import com.chathall.springchatserver.repositories.MessageRepository;
 import com.chathall.springchatserver.services.db.MessageService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -19,6 +17,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class MessageMongoService implements MessageService {
 
+    private static final int DEFAULT_MESSAGE_PAGE = 0;
     private static final int DEFAULT_MESSAGE_SIZE = 5;
 
     private final MessageRepository messageRepository;
@@ -31,19 +30,14 @@ public class MessageMongoService implements MessageService {
         return messageRepository.save(message);
     }
 
-    public Slice<Message> getByChatroomIdAndDateBefore(UUID chatroomId, LocalDateTime startDate, Integer size) {
-        size = setSize(size);
-        List<Message> messagesFromDB = messageRepository
-                .findByChatroomIdAndStartDateBeforeOrderByCreationDateDesc(chatroomId, startDate, size + 1);
-        boolean hasNext = messagesFromDB.size() > size;
-        List<Message> messages;
-        if (hasNext) {
-            // list is unmodifiable so it must be cloned
-            messages = new ArrayList<>(messagesFromDB.subList(0, size));
-            messages.removeLast();
-        } else
-            messages = messagesFromDB;
-        return new SliceImpl<>(messages, Pageable.unpaged(), hasNext);
+    public Slice<Message> getByChatroomIdAndBeforeOrEqualCreationDate(UUID chatroomId,
+                                                                      LocalDateTime endDate,
+                                                                      Integer page,
+                                                                      Integer size) {
+        var sort = Sort.by(Sort.Direction.DESC, "creationDate").and(Sort.by("id").descending());
+        return messageRepository.findByChatroomIdAndCreationDateLessThanEqual(
+                chatroomId, endDate, PageRequest.of(setPage(page), setSize(size), sort)
+        );
     }
 
     public void updateMessage(Message message) {
@@ -57,6 +51,10 @@ public class MessageMongoService implements MessageService {
 
     public Optional<Message> getById(UUID id) {
         return messageRepository.findById(id);
+    }
+
+    private int setPage(Integer page) {
+        return page == null ? DEFAULT_MESSAGE_PAGE : page;
     }
 
     private int setSize(Integer size) {

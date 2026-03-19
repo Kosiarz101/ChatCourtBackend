@@ -50,12 +50,14 @@ public class MessageController {
     }
 
     @GetMapping
-    public ResponseEntity<Slice<MessageResponseDTO>> getByChatroomIdPageable(
+    public ResponseEntity<Slice<MessageResponseDTO>> getByChatroomIdAndBeforeOrEqualCreationDate(
             @RequestParam UUID chatroomId,
-            @RequestParam LocalDateTime startDate,
+            @RequestParam LocalDateTime endDate,
+            @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size) {
         Slice<Message> messages;
-        messages = messageService.getByChatroomIdAndDateBefore(chatroomId, startDate, size);
+        messages = messageService
+                .getByChatroomIdAndBeforeOrEqualCreationDate(chatroomId, endDate, page, size);
         Slice<MessageResponseDTO> results = messages.map(messageDTOMapper::toDTO);
         return ResponseEntity.ok(results);
     }

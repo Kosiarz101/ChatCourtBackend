@@ -11,7 +11,7 @@ public interface MessageService {
 
     Message add(Message message);
 
-    Slice<Message> getByChatroomIdAndDateBefore(UUID chatroomId, LocalDateTime startDate, Integer size);
+    Slice<Message> getByChatroomIdAndBeforeOrEqualCreationDate(UUID chatroomId, LocalDateTime date, Integer page, Integer size);
 
     void updateMessage(Message message);
 
