@@ -1,7 +1,6 @@
 package com.chathall.springchatserver.models.app;
 
 import com.chathall.springchatserver.models.BaseModel;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -14,11 +13,9 @@ import java.util.Collection;
 @Setter
 @Accessors(chain = true)
 public class AppUser extends BaseModel implements UserDetails {
-    @Setter(AccessLevel.NONE)
-    @Getter(AccessLevel.NONE)
     private String email;
     private String password;
-    private String username;
+    private String appUsername;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -48,19 +45,5 @@ public class AppUser extends BaseModel implements UserDetails {
     @Override
     public String getUsername() {
         return email;
-    }
-
-    public AppUser setUsername(String email) {
-        this.email = email;
-        return this;
-    }
-
-    public String getAppUserUsername() {
-        return username;
-    }
-
-    public AppUser setAppUserUsername(String username) {
-        this.username = username;
-        return this;
     }
 }

@@ -14,16 +14,12 @@ import java.util.HashSet;
 public interface AppUserAppMapper {
 
     @Mappings({
-            @Mapping(target = "id", source = "id"),
-            @Mapping(target = "email", source = "username"),
-            @Mapping(target = "username", source = "appUserUsername")
+            @Mapping(target = "username", source = "appUsername"),
     })
     AppUserSimpleResponseDTO toDTO(AppUser appUser);
 
     @Mappings({
-            @Mapping(target = "username", source = "email"),
-            @Mapping(target = "appUserUsername", source = "username"),
-            @Mapping(target = "password", source = "password")
+            @Mapping(target = "appUsername", source = "username"),
     })
     AppUser fromRegisterUser(RegisterUserDTO registerUserDTO);
 }

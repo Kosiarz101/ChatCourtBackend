@@ -63,6 +63,6 @@ public class AppUserMongoService implements AppUserService {
         Optional<AppUserMongo> appUserMongo = appUserRepository.findByEmailIgnoreCase(email);
         if (appUserMongo.isEmpty())
             throw new UsernameNotFoundException(email);
-        return appUserMongo.get();
+        return appUserDataMapper.toApp(appUserMongo.get());
     }
 }
