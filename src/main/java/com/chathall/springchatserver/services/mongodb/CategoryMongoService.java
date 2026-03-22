@@ -1,6 +1,8 @@
 package com.chathall.springchatserver.services.mongodb;
 
-import com.chathall.springchatserver.models.mongodb.Category;
+import com.chathall.springchatserver.mappers.data.CategoryDataMapper;
+import com.chathall.springchatserver.models.app.Category;
+import com.chathall.springchatserver.models.data.mongodb.CategoryMongo;
 import com.chathall.springchatserver.repositories.CategoryRepository;
 import com.chathall.springchatserver.services.db.CategoryService;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +19,7 @@ import java.util.List;
 public class CategoryMongoService implements CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final CategoryDataMapper categoryDataMapper;
 
     public Category add(Category category) {
         if (categoryRepository.existsByName(category.getName())) {
@@ -26,10 +29,15 @@ public class CategoryMongoService implements CategoryService {
         LocalDateTime now = LocalDateTime.now();
         category.setCreationDate(now);
         category.setLastModifiedDate(now);
-        return categoryRepository.save(category);
+
+        CategoryMongo categoryMongo = categoryDataMapper.toEntity(category);
+        categoryMongo = categoryRepository.save(categoryMongo);
+        return categoryDataMapper.toApp(categoryMongo);
     }
 
     public List<Category> findAllSortByName() {
-        return categoryRepository.findAll(Sort.by("name"));
+        return categoryRepository.findAll(Sort.by("name")).stream()
+                .map(categoryDataMapper::toApp)
+                .toList();
     }
 }

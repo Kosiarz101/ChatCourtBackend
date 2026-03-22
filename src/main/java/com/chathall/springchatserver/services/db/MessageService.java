@@ -1,6 +1,6 @@
 package com.chathall.springchatserver.services.db;
 
-import com.chathall.springchatserver.models.mongodb.Message;
+import com.chathall.springchatserver.models.app.Message;
 import org.springframework.data.domain.Slice;
 
 import java.time.LocalDateTime;
@@ -9,11 +9,11 @@ import java.util.UUID;
 
 public interface MessageService {
 
-    Message add(Message message);
+    Message add(Message Message);
 
     Slice<Message> getByChatroomIdAndBeforeOrEqualCreationDate(UUID chatroomId, LocalDateTime date, Integer page, Integer size);
 
-    void updateMessage(Message message);
+    Message updateMessage(Message Message);
 
     void deleteMessage(UUID id);
 

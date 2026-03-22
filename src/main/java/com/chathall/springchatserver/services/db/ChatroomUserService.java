@@ -1,6 +1,6 @@
 package com.chathall.springchatserver.services.db;
 
-import com.chathall.springchatserver.models.mongodb.ChatroomUser;
+import com.chathall.springchatserver.models.app.ChatroomUser;
 
 import java.util.Optional;
 import java.util.UUID;

@@ -1,9 +1,9 @@
 package com.chathall.springchatserver.controllers;
 
-import com.chathall.springchatserver.dtos.frontend.response.AppUserSimpleResponseDTO;
-import com.chathall.springchatserver.dtos.frontend.request.LoginRequestDTO;
-import com.chathall.springchatserver.dtos.frontend.mappers.AppUserDTOMapper;
-import com.chathall.springchatserver.models.mongodb.AppUser;
+import com.chathall.springchatserver.mappers.app.AppUserAppMapper;
+import com.chathall.springchatserver.models.api.request.LoginRequestDTO;
+import com.chathall.springchatserver.models.api.response.AppUserSimpleResponseDTO;
+import com.chathall.springchatserver.models.app.AppUser;
 import com.chathall.springchatserver.services.JWTTokenService;
 import com.chathall.springchatserver.services.db.AppUserService;
 import jakarta.servlet.http.Cookie;
@@ -31,7 +31,7 @@ public class AuthController {
 
     private final JWTTokenService tokenService;
     private final AppUserService appUserService;
-    private final AppUserDTOMapper appUserDTOMapper;
+    private final AppUserAppMapper appUserDTOMapper;
     private final AuthenticationManager authenticationManager;
 
     @Value(value = "${jwt.cookie.name}")

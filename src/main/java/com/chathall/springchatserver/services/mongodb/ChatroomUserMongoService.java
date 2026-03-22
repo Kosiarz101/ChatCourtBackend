@@ -1,6 +1,8 @@
 package com.chathall.springchatserver.services.mongodb;
 
-import com.chathall.springchatserver.models.mongodb.ChatroomUser;
+import com.chathall.springchatserver.mappers.data.ChatroomUserDataMapper;
+import com.chathall.springchatserver.models.app.ChatroomUser;
+import com.chathall.springchatserver.models.data.mongodb.ChatroomUserMongo;
 import com.chathall.springchatserver.repositories.ChatroomUserRepository;
 import com.chathall.springchatserver.services.db.ChatroomUserService;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,7 @@ import java.util.UUID;
 public class ChatroomUserMongoService implements ChatroomUserService {
 
     private final ChatroomUserRepository chatroomUserRepository;
+    private final ChatroomUserDataMapper chatroomUserDataMapper;
     private final MongoTemplate mongoTemplate;
 
     public ChatroomUser add(ChatroomUser chatroomUser) {
@@ -31,18 +34,24 @@ public class ChatroomUserMongoService implements ChatroomUserService {
         LocalDateTime now = LocalDateTime.now();
         chatroomUser.setCreationDate(now);
         chatroomUser.setLastModifiedDate(now);
-        if (chatroomUserRepository.existsByUserAndChatroom(chatroomUser.getUser(), chatroomUser.getChatroom()))
+        if (chatroomUserRepository.existsByUserIdAndChatroomId(chatroomUser.getUser().getId(), chatroomUser.getChatroom().getId()))
             throw new ResponseStatusException(HttpStatusCode.valueOf(400), "User has been already added to this chatroom");
-        return chatroomUserRepository.save(chatroomUser);
+
+        var chatroomUserMongo = chatroomUserDataMapper.toEntity(chatroomUser);
+        chatroomUserMongo = chatroomUserRepository.save(chatroomUserMongo);
+        return chatroomUserDataMapper.toApp(chatroomUserMongo);
     }
 
     public Optional<ChatroomUser> getById(UUID id) {
         AggregationOperation match = new MatchOperation(Criteria.where("_id").is(id));
-        AggregationResults<ChatroomUser> aggregationResults = mongoTemplate.aggregate(Aggregation.newAggregation(List.of(match)),
-                "chatroomUser", ChatroomUser.class);
-        List<ChatroomUser> results = aggregationResults.getMappedResults();
+        AggregationResults<ChatroomUserMongo> aggregationResults = mongoTemplate.aggregate(
+                Aggregation.newAggregation(List.of(match)),
+                "chatroomUser",
+                ChatroomUserMongo.class);
+        List<ChatroomUserMongo> results = aggregationResults.getMappedResults();
         if (results.isEmpty())
             return Optional.empty();
-        return Optional.of(results.getFirst());
+        ChatroomUserMongo chatroomUserMongo = results.getFirst();
+        return Optional.of(chatroomUserDataMapper.toApp(chatroomUserMongo));
     }
 }

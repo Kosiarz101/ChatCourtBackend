@@ -1,9 +1,9 @@
 package com.chathall.springchatserver.controllers;
 
-import com.chathall.springchatserver.dtos.frontend.response.AppUserSimpleResponseDTO;
-import com.chathall.springchatserver.dtos.frontend.request.RegisterUserDTO;
-import com.chathall.springchatserver.dtos.frontend.mappers.AppUserDTOMapper;
-import com.chathall.springchatserver.models.mongodb.AppUser;
+import com.chathall.springchatserver.mappers.app.AppUserAppMapper;
+import com.chathall.springchatserver.models.api.request.RegisterUserDTO;
+import com.chathall.springchatserver.models.api.response.AppUserSimpleResponseDTO;
+import com.chathall.springchatserver.models.app.AppUser;
 import com.chathall.springchatserver.services.JWTTokenService;
 import com.chathall.springchatserver.services.db.AppUserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,13 +21,14 @@ import java.util.UUID;
 public class AppUserController {
 
     private final AppUserService appUserService;
-    private final AppUserDTOMapper appUserDTOMapper;
+    private final AppUserAppMapper appUserAppMapper;
     private final JWTTokenService tokenService;
 
     @PostMapping
     public ResponseEntity<AppUserSimpleResponseDTO> add(@RequestBody RegisterUserDTO appUserDTO) {
-        AppUser appUser = appUserService.add(appUserDTOMapper.fromRegisterUser(appUserDTO));
-        return ResponseEntity.status(201).body(appUserDTOMapper.toDTO(appUser));
+        var appUser = appUserAppMapper.fromRegisterUser(appUserDTO);
+        appUser = appUserService.add(appUser);
+        return ResponseEntity.status(201).body(appUserAppMapper.toDTO(appUser));
     }
 
 //    @GetMapping
@@ -59,6 +60,6 @@ public class AppUserController {
         AppUser appUser = appUserService.getByEmail(email).orElseThrow(
                 () -> new ResponseStatusException(HttpStatusCode.valueOf(404), "User with this email doesn't exist")
         );
-        return ResponseEntity.ok(appUserDTOMapper.toDTO(appUser));
+        return ResponseEntity.ok(appUserAppMapper.toDTO(appUser));
     }
 }

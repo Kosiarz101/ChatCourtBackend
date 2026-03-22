@@ -1,7 +1,7 @@
 package com.chathall.springchatserver.repositories;
 
-import com.chathall.springchatserver.models.mongodb.Chatroom;
-import com.chathall.springchatserver.models.ChatroomSearch;
+import com.chathall.springchatserver.models.data.mongodb.ChatroomMongo;
+import com.chathall.springchatserver.models.app.ChatroomSearch;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.mongodb.repository.Aggregation;
@@ -12,16 +12,16 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface ChatroomRepository extends MongoRepository<Chatroom, UUID> {
+public interface ChatroomRepository extends MongoRepository<ChatroomMongo, UUID> {
 
-    Slice<Chatroom> findAllByOrderByCreationDateDesc(Pageable pageable);
+    Slice<ChatroomMongo> findAllByOrderByCreationDateDesc(Pageable pageable);
 
     @Aggregation(pipeline = {
             "{$match: {\"_id\": { $in: ?0 } } }",
             "{$sort: {\"creationDate\": -1}}",
             "{$lookup: { from: \"message\", localField: \"_id\", foreignField: \"chatroom\", as: \"messages\", pipeline: [{$sort: { 'creationDate': -1 }}, { $limit: ?1 } ] }}",
     })
-    Slice<Chatroom> findAllByIdsOrderByCreationDateDescWithMessages(List<UUID> chatroomIds, int numberOfMessages, Pageable pageable);
+    Slice<ChatroomMongo> findAllByIdsOrderByCreationDateDescWithMessages(List<UUID> chatroomIds, int numberOfMessages, Pageable pageable);
 
     @Aggregation(pipeline =  {
             " {'$match': { $and: [{ name: {'$regex': /?0/, $options: 'i' } }, { 'category': ?1 }, { isPublic: true }] } }",
@@ -51,7 +51,7 @@ public interface ChatroomRepository extends MongoRepository<Chatroom, UUID> {
     })
     Slice<ChatroomSearch> findAllPublicByName(String name, Pageable pageable);
 
-    Slice<Chatroom> findAllByNameContainsIgnoreCaseAndIsPublicTrue(String name, Pageable pageable);
+    Slice<ChatroomMongo> findAllByNameContainsIgnoreCaseAndIsPublicTrue(String name, Pageable pageable);
 
     boolean existsByName(String name);
 }

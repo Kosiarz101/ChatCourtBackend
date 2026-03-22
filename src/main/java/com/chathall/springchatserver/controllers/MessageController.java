@@ -1,10 +1,10 @@
 package com.chathall.springchatserver.controllers;
 
-import com.chathall.springchatserver.dtos.frontend.mappers.MessageDTOMapper;
-import com.chathall.springchatserver.dtos.frontend.request.MessageRequestDTO;
-import com.chathall.springchatserver.dtos.frontend.response.MessageResponseDTO;
+import com.chathall.springchatserver.mappers.app.MessageAppMapper;
 import com.chathall.springchatserver.models.SliceResponse;
-import com.chathall.springchatserver.models.mongodb.Message;
+import com.chathall.springchatserver.models.api.request.MessageRequestDTO;
+import com.chathall.springchatserver.models.api.response.MessageResponseDTO;
+import com.chathall.springchatserver.models.app.Message;
 import com.chathall.springchatserver.services.db.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,25 +29,25 @@ import java.util.UUID;
 public class MessageController {
 
     private final MessageService messageService;
-    private final MessageDTOMapper messageDTOMapper;
+    private final MessageAppMapper messageAppMapper;
     private final SimpMessagingTemplate simpMessagingTemplate;
     @Value("${client.stomp.destination}")
     private String stompDestination;
 
     @MessageMapping("/message/add")
     public void createMessage(@Payload MessageRequestDTO messageRequestDTO) {
-        Message message = messageDTOMapper.toEntity(messageRequestDTO);
+        Message message = messageAppMapper.toApp(messageRequestDTO);
         message = messageService.add(message);
         simpMessagingTemplate.convertAndSend(stompDestination + "/message/add/" + message.getChatroom().getId(),
-                ResponseEntity.status(201).body(messageDTOMapper.toDTO(message)));
+                ResponseEntity.status(201).body(messageAppMapper.toDTO(message)));
     }
 
     @MessageMapping("/message/update")
     public void updateMessage(@Payload MessageRequestDTO messageRequestDTO) {
-        Message message = messageDTOMapper.toEntity(messageRequestDTO);
+        Message message = messageAppMapper.toApp(messageRequestDTO);
         messageService.updateMessage(message);
         simpMessagingTemplate.convertAndSend(stompDestination + "/message/update/" + message.getChatroom().getId(),
-                ResponseEntity.status(200).body(messageDTOMapper.toDTO(message)));
+                ResponseEntity.status(200).body(messageAppMapper.toDTO(message)));
     }
 
     @GetMapping
@@ -59,7 +59,7 @@ public class MessageController {
         Slice<Message> messages;
         messages = messageService
                 .getByChatroomIdAndBeforeOrEqualCreationDate(chatroomId, endDate, page, size);
-        Slice<MessageResponseDTO> results = messages.map(messageDTOMapper::toDTO);
+        Slice<MessageResponseDTO> results = messages.map(messageAppMapper::toDTO);
         return ResponseEntity.ok(SliceResponse.fromSlice(results));
     }
 
@@ -70,6 +70,6 @@ public class MessageController {
         );
         messageService.deleteMessage(id);
         simpMessagingTemplate.convertAndSend(stompDestination + "/message/delete/" + message.getChatroom().getId(),
-                ResponseEntity.status(204).body(messageDTOMapper.toDTO(message)));
+                ResponseEntity.status(204).body(messageAppMapper.toDTO(message)));
     }
 }

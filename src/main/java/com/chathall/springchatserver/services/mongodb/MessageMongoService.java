@@ -1,6 +1,8 @@
 package com.chathall.springchatserver.services.mongodb;
 
-import com.chathall.springchatserver.models.mongodb.Message;
+import com.chathall.springchatserver.mappers.data.MessageDataMapper;
+import com.chathall.springchatserver.models.app.Message;
+import com.chathall.springchatserver.models.data.mongodb.MessageMongo;
 import com.chathall.springchatserver.repositories.MessageRepository;
 import com.chathall.springchatserver.services.db.MessageService;
 import lombok.RequiredArgsConstructor;
@@ -21,13 +23,18 @@ public class MessageMongoService implements MessageService {
     private static final int DEFAULT_MESSAGE_SIZE = 5;
 
     private final MessageRepository messageRepository;
+    private final MessageDataMapper messageDataMapper;
 
     public Message add(Message message) {
         message.setNewId();
         LocalDateTime now = LocalDateTime.now();
         message.setCreationDate(now);
         message.setLastModifiedDate(now);
-        return messageRepository.save(message);
+
+        MessageMongo messageMongo = messageDataMapper.toEntity(message);
+        messageMongo = messageRepository.save(messageMongo);
+
+        return messageDataMapper.toApp(messageMongo);
     }
 
     public Slice<Message> getByChatroomIdAndBeforeOrEqualCreationDate(UUID chatroomId,
@@ -35,14 +42,20 @@ public class MessageMongoService implements MessageService {
                                                                       Integer page,
                                                                       Integer size) {
         var sort = Sort.by(Sort.Direction.DESC, "creationDate").and(Sort.by("id").descending());
-        return messageRepository.findByChatroomIdAndCreationDateLessThanEqual(
+        Slice<MessageMongo> messageMongos = messageRepository.findByChatroomIdAndCreationDateLessThanEqual(
                 chatroomId, endDate, PageRequest.of(setPage(page), setSize(size), sort)
         );
+
+        return messageMongos.map(messageDataMapper::toApp);
     }
 
-    public void updateMessage(Message message) {
+    public Message updateMessage(Message message) {
         message.setLastModifiedDate(LocalDateTime.now());
-        messageRepository.save(message);
+
+        MessageMongo messageMongo = messageDataMapper.toEntity(message);
+        messageRepository.save(messageMongo);
+
+        return messageDataMapper.toApp(messageMongo);
     }
 
     public void deleteMessage(UUID id) {
@@ -50,7 +63,8 @@ public class MessageMongoService implements MessageService {
     }
 
     public Optional<Message> getById(UUID id) {
-        return messageRepository.findById(id);
+        Optional<MessageMongo> messageMongo = messageRepository.findById(id);
+        return messageMongo.map(messageDataMapper::toApp);
     }
 
     private int setPage(Integer page) {

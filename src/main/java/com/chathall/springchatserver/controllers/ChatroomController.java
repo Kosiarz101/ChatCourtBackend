@@ -1,13 +1,13 @@
 package com.chathall.springchatserver.controllers;
 
-import com.chathall.springchatserver.dtos.frontend.mappers.ChatroomDTOMapper;
-import com.chathall.springchatserver.dtos.frontend.mappers.ChatroomSearchDTOMapper;
-import com.chathall.springchatserver.dtos.frontend.request.ChatroomRequestDTO;
-import com.chathall.springchatserver.dtos.frontend.response.ChatroomResponseDTO;
-import com.chathall.springchatserver.dtos.frontend.response.ChatroomSearchDTO;
-import com.chathall.springchatserver.models.ChatroomSearch;
+import com.chathall.springchatserver.mappers.app.ChatroomSearchAppMapper;
+import com.chathall.springchatserver.mappers.app.ChatroomAppMapper;
+import com.chathall.springchatserver.models.app.ChatroomSearch;
 import com.chathall.springchatserver.models.SliceResponse;
-import com.chathall.springchatserver.models.mongodb.Chatroom;
+import com.chathall.springchatserver.models.api.request.ChatroomRequestDTO;
+import com.chathall.springchatserver.models.api.response.ChatroomResponseDTO;
+import com.chathall.springchatserver.models.api.response.ChatroomSearchDTO;
+import com.chathall.springchatserver.models.app.Chatroom;
 import com.chathall.springchatserver.services.db.ChatroomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
@@ -25,13 +25,13 @@ import java.util.UUID;
 public class ChatroomController {
 
     private final ChatroomService chatroomService;
-    private final ChatroomDTOMapper chatroomDTOMapper;
-    private final ChatroomSearchDTOMapper chatroomSearchDTOMapper;
+    private final ChatroomAppMapper chatroomAppMapper;
+    private final ChatroomSearchAppMapper chatroomSearchDTOMapper;
 
     @PostMapping
     public ResponseEntity<ChatroomResponseDTO> add(@RequestBody ChatroomRequestDTO chatroomRequestDTO) {
-        Chatroom chatroom = chatroomService.add(toEntity(chatroomRequestDTO));
-        return ResponseEntity.status(201).body(toDTO(chatroom));
+        Chatroom Chatroom = chatroomService.add(toApp(chatroomRequestDTO));
+        return ResponseEntity.status(201).body(toDTO(Chatroom));
     }
 
     @GetMapping
@@ -47,10 +47,10 @@ public class ChatroomController {
                                                        @RequestParam(defaultValue = "false") boolean includeMessages,
                                                        @RequestParam(defaultValue = "false") boolean includeUsers) {
         Optional<Chatroom> chatroomOptional = chatroomService.findById(id, includeMessages, includeUsers);
-        Chatroom chatroom = chatroomOptional.orElseThrow(() ->
+        Chatroom Chatroom = chatroomOptional.orElseThrow(() ->
                 new ResponseStatusException(HttpStatusCode.valueOf(404), "Chatroom has not been found")
         );
-        return ResponseEntity.status(200).body(toDTO(chatroom));
+        return ResponseEntity.status(200).body(toDTO(Chatroom));
     }
 
     @GetMapping(params = "userId")
@@ -84,12 +84,12 @@ public class ChatroomController {
         return ResponseEntity.ok(SliceResponse.fromSlice(results));
     }
 
-    private Chatroom toEntity(ChatroomRequestDTO dto) {
-        return chatroomDTOMapper.toEntity(dto);
+    private Chatroom toApp(ChatroomRequestDTO dto) {
+        return chatroomAppMapper.toApp(dto);
     }
 
     private ChatroomResponseDTO toDTO(Chatroom chatroom) {
-        return chatroomDTOMapper.toDTO(chatroom);
+        return chatroomAppMapper.toDTO(chatroom);
     }
 
     private ChatroomSearchDTO toDTO(ChatroomSearch chatroomSearch) {

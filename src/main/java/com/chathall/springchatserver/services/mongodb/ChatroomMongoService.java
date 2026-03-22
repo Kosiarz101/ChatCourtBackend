@@ -1,7 +1,9 @@
 package com.chathall.springchatserver.services.mongodb;
 
-import com.chathall.springchatserver.models.mongodb.Chatroom;
-import com.chathall.springchatserver.models.ChatroomSearch;
+import com.chathall.springchatserver.mappers.data.ChatroomDataMapper;
+import com.chathall.springchatserver.models.app.ChatroomSearch;
+import com.chathall.springchatserver.models.app.Chatroom;
+import com.chathall.springchatserver.models.data.mongodb.ChatroomMongo;
 import com.chathall.springchatserver.repositories.ChatroomRepository;
 import com.chathall.springchatserver.repositories.ChatroomUserRepository;
 import com.chathall.springchatserver.services.db.ChatroomService;
@@ -31,6 +33,7 @@ public class ChatroomMongoService implements ChatroomService {
 
     private final ChatroomRepository chatroomRepository;
     private final ChatroomUserRepository chatroomUserRepository;
+    private final ChatroomDataMapper chatroomDataMapper;
     private final MongoTemplate mongoTemplate;
 
     public Chatroom add(Chatroom chatroom) {
@@ -38,15 +41,22 @@ public class ChatroomMongoService implements ChatroomService {
         LocalDateTime now = LocalDateTime.now();
         chatroom.setCreationDate(now);
         chatroom.setLastModifiedDate(now);
-        return chatroomRepository.save(chatroom);
+
+        ChatroomMongo chatroomMongo = chatroomDataMapper.toEntity(chatroom);
+        chatroomMongo = chatroomRepository.save(chatroomMongo);
+
+        return chatroomDataMapper.toApp(chatroomMongo);
     }
 
     public Slice<Chatroom> findAll(@Nullable Integer pageNumber, @Nullable Integer pageSize) {
-        return chatroomRepository.findAllByOrderByCreationDateDesc(PageRequest.of(getPage(pageNumber), getPageSize(pageSize)));
+        Slice<ChatroomMongo> chatroomMongos = chatroomRepository
+                .findAllByOrderByCreationDateDesc(PageRequest.of(getPage(pageNumber), getPageSize(pageSize)));
+        return chatroomMongos.map(chatroomDataMapper::toApp);
     }
 
     public Optional<Chatroom> findById(UUID id) {
-        return chatroomRepository.findById(id);
+        var chatroomMongo = chatroomRepository.findById(id);
+        return chatroomMongo.map(chatroomDataMapper::toApp);
     }
 
     public Optional<Chatroom> findById(UUID id, boolean includeMessages, boolean includeChatroomUsers) {
@@ -59,10 +69,11 @@ public class ChatroomMongoService implements ChatroomService {
             pipeline.add(createChatroomUsersLookup());
         Aggregation agg = Aggregation.newAggregation(pipeline);
 
-        AggregationResults<Chatroom> results = mongoTemplate.aggregate(agg, "chatroom", Chatroom.class);
+        AggregationResults<ChatroomMongo> results = mongoTemplate.aggregate(agg, "chatroom", ChatroomMongo.class);
         if (results.getMappedResults().isEmpty())
             return Optional.empty();
-        return Optional.of(results.getMappedResults().getFirst());
+        ChatroomMongo chatroomMongo = results.getMappedResults().getFirst();
+        return Optional.of(chatroomDataMapper.toApp(chatroomMongo));
     }
 
     public Slice<Chatroom> findByUserId(UUID chatroomUserId, boolean includeMessages, boolean includeChatroomUsers,
@@ -84,15 +95,19 @@ public class ChatroomMongoService implements ChatroomService {
             pipeline.add(createChatroomUsersLookup());
         Aggregation agg = Aggregation.newAggregation(pipeline);
 
-        AggregationResults<Chatroom> aggregationResults = mongoTemplate.aggregate(agg, "chatroom", Chatroom.class);
-        List<Chatroom> results = aggregationResults.getMappedResults();
+        AggregationResults<ChatroomMongo> aggregationResults = mongoTemplate.aggregate(agg, "chatroom", ChatroomMongo.class);
+        List<ChatroomMongo> results = aggregationResults.getMappedResults();
 
         boolean hasNext = results.size() > size;
         if (hasNext) {
             results = new ArrayList<>(results);
             results.removeLast();
         }
-        return new SliceImpl<>(results, PageRequest.of(page, size), hasNext);
+
+        List<Chatroom> chatrooms = results.stream()
+                .map(chatroomDataMapper::toApp)
+                .toList();
+        return new SliceImpl<>(chatrooms, PageRequest.of(page, size), hasNext);
     }
 
     public Slice<ChatroomSearch> findByNameAndCategoryId(String name, UUID categoryId, @Nullable Integer page,

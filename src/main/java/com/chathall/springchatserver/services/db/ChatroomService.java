@@ -1,7 +1,7 @@
 package com.chathall.springchatserver.services.db;
 
-import com.chathall.springchatserver.models.mongodb.Chatroom;
-import com.chathall.springchatserver.models.ChatroomSearch;
+import com.chathall.springchatserver.models.app.ChatroomSearch;
+import com.chathall.springchatserver.models.app.Chatroom;
 import org.springframework.data.domain.Slice;
 import org.springframework.lang.Nullable;
 
@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public interface ChatroomService {
 
-    Chatroom add(Chatroom chatroom);
+    Chatroom add(Chatroom Chatroom);
 
     Slice<Chatroom> findAll(@Nullable Integer pageNumber, @Nullable Integer pageSize);
 

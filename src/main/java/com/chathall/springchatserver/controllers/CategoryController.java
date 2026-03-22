@@ -1,9 +1,9 @@
 package com.chathall.springchatserver.controllers;
 
-import com.chathall.springchatserver.dtos.frontend.mappers.CategoryDTOMapper;
-import com.chathall.springchatserver.dtos.frontend.request.CategoryRequestDTO;
-import com.chathall.springchatserver.dtos.frontend.response.CategoryResponseDTO;
-import com.chathall.springchatserver.models.mongodb.Category;
+import com.chathall.springchatserver.mappers.app.CategoryAppMapper;
+import com.chathall.springchatserver.models.api.request.CategoryRequestDTO;
+import com.chathall.springchatserver.models.api.response.CategoryResponseDTO;
+import com.chathall.springchatserver.models.app.Category;
 import com.chathall.springchatserver.services.db.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;
@@ -18,19 +18,19 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CategoryController {
 
-    private final CategoryDTOMapper categoryDTOMapper;
+    private final CategoryAppMapper categoryAppMapper;
     private final CategoryService categoryService;
 
     @PostMapping
     public ResponseEntity<CategoryResponseDTO> add(@RequestBody CategoryRequestDTO categoryDTO) {
-        Category category = categoryDTOMapper.toEntity(categoryDTO);
+        Category category = categoryAppMapper.toApp(categoryDTO);
         category = categoryService.add(category);
-        return ResponseEntity.status(HttpStatusCode.valueOf(201)).body(categoryDTOMapper.toDTO(category));
+        return ResponseEntity.status(HttpStatusCode.valueOf(201)).body(categoryAppMapper.toDTO(category));
     }
 
     @GetMapping
     public ResponseEntity<List<CategoryResponseDTO>> findAll() {
         List<Category> categories = categoryService.findAllSortByName();
-        return ResponseEntity.ok(categories.stream().map(categoryDTOMapper::toDTO).collect(Collectors.toList()));
+        return ResponseEntity.ok(categories.stream().map(categoryAppMapper::toDTO).collect(Collectors.toList()));
     }
 }

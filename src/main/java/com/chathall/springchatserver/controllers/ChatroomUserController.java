@@ -1,9 +1,9 @@
 package com.chathall.springchatserver.controllers;
 
-import com.chathall.springchatserver.dtos.frontend.mappers.ChatroomUserDTOMapper;
-import com.chathall.springchatserver.dtos.frontend.request.ChatroomUserRequestDTO;
-import com.chathall.springchatserver.dtos.frontend.response.ChatroomUserSimpleResponseDTO;
-import com.chathall.springchatserver.models.mongodb.ChatroomUser;
+import com.chathall.springchatserver.mappers.app.ChatroomUserAppMapper;
+import com.chathall.springchatserver.models.api.request.ChatroomUserRequestDTO;
+import com.chathall.springchatserver.models.api.response.ChatroomUserSimpleResponseDTO;
+import com.chathall.springchatserver.models.app.ChatroomUser;
 import com.chathall.springchatserver.services.db.ChatroomUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ChatroomUserController {
 
     private final ChatroomUserService chatroomUserService;
-    private final ChatroomUserDTOMapper chatroomUserDTOMapper;
+    private final ChatroomUserAppMapper chatroomUserAppMapper;
     private final SimpMessagingTemplate simpMessagingTemplate;
 
     @Value("${client.stomp.destination}")
@@ -28,7 +28,7 @@ public class ChatroomUserController {
 
     @PostMapping
     public ResponseEntity<ChatroomUserSimpleResponseDTO> add(@RequestBody ChatroomUserRequestDTO chatroomUserRequestDTO) {
-        ChatroomUser chatroomUser = toEntity(chatroomUserRequestDTO);
+        ChatroomUser chatroomUser = toApp(chatroomUserRequestDTO);
         chatroomUserService.add(chatroomUser);
         chatroomUser = chatroomUserService.getById(chatroomUser.getId()).orElse(null);
         ChatroomUserSimpleResponseDTO chatroomUserResponseDTOFromDB = toDTO(chatroomUser);
@@ -40,10 +40,10 @@ public class ChatroomUserController {
     }
 
     private ChatroomUserSimpleResponseDTO toDTO(ChatroomUser chatroomUser) {
-        return chatroomUserDTOMapper.toDTO(chatroomUser);
+        return chatroomUserAppMapper.toDTO(chatroomUser);
     }
 
-    private ChatroomUser toEntity(ChatroomUserRequestDTO dto) {
-        return chatroomUserDTOMapper.toEntity(dto);
+    private ChatroomUser toApp(ChatroomUserRequestDTO dto) {
+        return chatroomUserAppMapper.toApp(dto);
     }
 }
