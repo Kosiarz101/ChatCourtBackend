@@ -1,5 +1,6 @@
-package com.chathall.springchatserver.models;
+package com.chathall.springchatserver.models.mongodb;
 
+import com.chathall.springchatserver.models.BaseModel;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;

@@ -3,7 +3,7 @@ package com.chathall.springchatserver.controllers;
 import com.chathall.springchatserver.dtos.frontend.mappers.ChatroomUserDTOMapper;
 import com.chathall.springchatserver.dtos.frontend.request.ChatroomUserRequestDTO;
 import com.chathall.springchatserver.dtos.frontend.response.ChatroomUserSimpleResponseDTO;
-import com.chathall.springchatserver.models.ChatroomUser;
+import com.chathall.springchatserver.models.mongodb.ChatroomUser;
 import com.chathall.springchatserver.services.db.ChatroomUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

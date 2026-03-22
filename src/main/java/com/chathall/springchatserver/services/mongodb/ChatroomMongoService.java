@@ -1,6 +1,6 @@
 package com.chathall.springchatserver.services.mongodb;
 
-import com.chathall.springchatserver.models.Chatroom;
+import com.chathall.springchatserver.models.mongodb.Chatroom;
 import com.chathall.springchatserver.models.ChatroomSearch;
 import com.chathall.springchatserver.repositories.ChatroomRepository;
 import com.chathall.springchatserver.repositories.ChatroomUserRepository;
@@ -27,7 +27,7 @@ import java.util.UUID;
 public class ChatroomMongoService implements ChatroomService {
 
     private final int DEFAULT_CHATROOM_SIZE = 5;
-    private final int DEFAULT_CHATROOM_PAGE = 1;
+    private final int DEFAULT_CHATROOM_PAGE = 0;
 
     private final ChatroomRepository chatroomRepository;
     private final ChatroomUserRepository chatroomUserRepository;
@@ -65,10 +65,12 @@ public class ChatroomMongoService implements ChatroomService {
         return Optional.of(results.getMappedResults().getFirst());
     }
 
-    public Slice<Chatroom> findByUserIdPageable(UUID chatroomUserId, boolean includeMessages,
-                                                boolean includeChatroomUsers, int page, @Nullable Integer size) {
+    public Slice<Chatroom> findByUserId(UUID chatroomUserId, boolean includeMessages, boolean includeChatroomUsers,
+                                        @Nullable Integer page, @Nullable Integer size) {
+        page = getPage(page);
         size = getPageSize(size);
-        Slice<UUID> chatroomUsers = chatroomUserRepository.findChatroomIdsByUserId(chatroomUserId, PageRequest.of(page, size + 1));
+        Slice<UUID> chatroomUsers = chatroomUserRepository
+                .findChatroomIdsByUserId(chatroomUserId, PageRequest.of(page, size + 1));
         List<UUID> chatroomIds = chatroomUsers.getContent().stream().toList();
 
         Criteria criteria = Criteria.where("_id").in(chatroomIds);
@@ -93,12 +95,14 @@ public class ChatroomMongoService implements ChatroomService {
         return new SliceImpl<>(results, PageRequest.of(page, size), hasNext);
     }
 
-    public Slice<ChatroomSearch> findByNameAndCategoryId(String name, UUID categoryId, int page, @Nullable Integer size) {
-        return chatroomRepository.findAllPublicByNameAndCategory(name, categoryId, PageRequest.of(page, getPageSize(size)));
+    public Slice<ChatroomSearch> findByNameAndCategoryId(String name, UUID categoryId, @Nullable Integer page,
+                                                         @Nullable Integer size) {
+        return chatroomRepository
+                .findAllPublicByNameAndCategory(name, categoryId, PageRequest.of(getPage(page), getPageSize(size)));
     }
 
-    public Slice<ChatroomSearch> findByNameContains(String name, int page, @Nullable Integer size) {
-        return chatroomRepository.findAllPublicByName(name, PageRequest.of(page, getPageSize(size)));
+    public Slice<ChatroomSearch> findByNameContains(String name, @Nullable Integer page, @Nullable Integer size) {
+        return chatroomRepository.findAllPublicByName(name, PageRequest.of(getPage(page), getPageSize(size)));
     }
 
     private AggregationOperation createMessagesLookup() {

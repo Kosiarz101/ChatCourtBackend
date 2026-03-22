@@ -1,6 +1,6 @@
 package com.chathall.springchatserver.services.db;
 
-import com.chathall.springchatserver.models.Category;
+import com.chathall.springchatserver.models.mongodb.Category;
 
 import java.util.List;
 

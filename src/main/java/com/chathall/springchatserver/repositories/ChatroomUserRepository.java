@@ -1,8 +1,8 @@
 package com.chathall.springchatserver.repositories;
 
-import com.chathall.springchatserver.models.AppUser;
-import com.chathall.springchatserver.models.Chatroom;
-import com.chathall.springchatserver.models.ChatroomUser;
+import com.chathall.springchatserver.models.mongodb.AppUser;
+import com.chathall.springchatserver.models.mongodb.Chatroom;
+import com.chathall.springchatserver.models.mongodb.ChatroomUser;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.mongodb.repository.Aggregation;

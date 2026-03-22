@@ -1,6 +1,6 @@
 package com.chathall.springchatserver.services.db;
 
-import com.chathall.springchatserver.models.AppUser;
+import com.chathall.springchatserver.models.mongodb.AppUser;
 import org.springframework.data.domain.Slice;
 import org.springframework.security.core.userdetails.UserDetailsService;
 

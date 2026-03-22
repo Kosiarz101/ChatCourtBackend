@@ -3,7 +3,7 @@ package com.chathall.springchatserver.controllers;
 import com.chathall.springchatserver.dtos.frontend.response.AppUserSimpleResponseDTO;
 import com.chathall.springchatserver.dtos.frontend.request.LoginRequestDTO;
 import com.chathall.springchatserver.dtos.frontend.mappers.AppUserDTOMapper;
-import com.chathall.springchatserver.models.AppUser;
+import com.chathall.springchatserver.models.mongodb.AppUser;
 import com.chathall.springchatserver.services.JWTTokenService;
 import com.chathall.springchatserver.services.db.AppUserService;
 import jakarta.servlet.http.Cookie;

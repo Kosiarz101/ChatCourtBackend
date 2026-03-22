@@ -1,5 +1,7 @@
-package com.chathall.springchatserver.models;
+package com.chathall.springchatserver.models.mongodb;
 
+import com.chathall.springchatserver.enums.ChatroomUserRole;
+import com.chathall.springchatserver.models.BaseModel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -13,14 +15,13 @@ import java.util.Set;
 @Setter
 @Accessors(chain = true)
 @Document
-public class Chatroom extends BaseModel {
-    private String name;
-    private String description;
-    private boolean isPublic = true;
+public class ChatroomUser extends BaseModel {
+    private ChatroomUserRole role = ChatroomUserRole.USER;
     @DocumentReference
-    private Category category;
+    private AppUser user;
+    @DocumentReference
+    private Chatroom chatroom;
     @ReadOnlyProperty
-    private Set<ChatroomUser> users;
-    @ReadOnlyProperty
+    //@DocumentReference(lookup = "{ 'appUser':?#{#self._id} }")
     private Set<Message> messages;
 }

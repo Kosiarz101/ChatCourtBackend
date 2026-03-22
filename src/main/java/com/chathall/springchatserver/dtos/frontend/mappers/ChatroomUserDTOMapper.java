@@ -2,7 +2,7 @@ package com.chathall.springchatserver.dtos.frontend.mappers;
 
 import com.chathall.springchatserver.dtos.frontend.request.ChatroomUserRequestDTO;
 import com.chathall.springchatserver.dtos.frontend.response.ChatroomUserSimpleResponseDTO;
-import com.chathall.springchatserver.models.ChatroomUser;
+import com.chathall.springchatserver.models.mongodb.ChatroomUser;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;

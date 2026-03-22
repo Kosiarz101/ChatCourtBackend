@@ -3,7 +3,8 @@ package com.chathall.springchatserver.controllers;
 import com.chathall.springchatserver.dtos.frontend.mappers.MessageDTOMapper;
 import com.chathall.springchatserver.dtos.frontend.request.MessageRequestDTO;
 import com.chathall.springchatserver.dtos.frontend.response.MessageResponseDTO;
-import com.chathall.springchatserver.models.Message;
+import com.chathall.springchatserver.models.SliceResponse;
+import com.chathall.springchatserver.models.mongodb.Message;
 import com.chathall.springchatserver.services.db.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -50,7 +51,7 @@ public class MessageController {
     }
 
     @GetMapping
-    public ResponseEntity<Slice<MessageResponseDTO>> getByChatroomIdAndBeforeOrEqualCreationDate(
+    public ResponseEntity<SliceResponse<MessageResponseDTO>> getByChatroomIdAndBeforeOrEqualCreationDate(
             @RequestParam UUID chatroomId,
             @RequestParam LocalDateTime endDate,
             @RequestParam(required = false) Integer page,
@@ -59,7 +60,7 @@ public class MessageController {
         messages = messageService
                 .getByChatroomIdAndBeforeOrEqualCreationDate(chatroomId, endDate, page, size);
         Slice<MessageResponseDTO> results = messages.map(messageDTOMapper::toDTO);
-        return ResponseEntity.ok(results);
+        return ResponseEntity.ok(SliceResponse.fromSlice(results));
     }
 
     @MessageMapping("/message/delete")

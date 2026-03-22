@@ -1,6 +1,6 @@
 package com.chathall.springchatserver.repositories;
 
-import com.chathall.springchatserver.models.Category;
+import com.chathall.springchatserver.models.mongodb.Category;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 

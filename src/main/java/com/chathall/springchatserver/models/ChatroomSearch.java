@@ -1,5 +1,6 @@
 package com.chathall.springchatserver.models;
 
+import com.chathall.springchatserver.models.mongodb.Category;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;

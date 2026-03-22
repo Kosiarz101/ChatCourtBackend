@@ -1,6 +1,6 @@
 package com.chathall.springchatserver.services.db;
 
-import com.chathall.springchatserver.models.Message;
+import com.chathall.springchatserver.models.mongodb.Message;
 import org.springframework.data.domain.Slice;
 
 import java.time.LocalDateTime;

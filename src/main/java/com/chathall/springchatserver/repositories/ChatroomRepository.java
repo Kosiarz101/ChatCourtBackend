@@ -1,6 +1,6 @@
 package com.chathall.springchatserver.repositories;
 
-import com.chathall.springchatserver.models.Chatroom;
+import com.chathall.springchatserver.models.mongodb.Chatroom;
 import com.chathall.springchatserver.models.ChatroomSearch;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;

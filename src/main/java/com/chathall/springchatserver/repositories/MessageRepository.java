@@ -1,6 +1,6 @@
 package com.chathall.springchatserver.repositories;
 
-import com.chathall.springchatserver.models.Message;
+import com.chathall.springchatserver.models.mongodb.Message;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.mongodb.repository.MongoRepository;

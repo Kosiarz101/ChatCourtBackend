@@ -3,7 +3,7 @@ package com.chathall.springchatserver.controllers;
 import com.chathall.springchatserver.dtos.frontend.mappers.CategoryDTOMapper;
 import com.chathall.springchatserver.dtos.frontend.request.CategoryRequestDTO;
 import com.chathall.springchatserver.dtos.frontend.response.CategoryResponseDTO;
-import com.chathall.springchatserver.models.Category;
+import com.chathall.springchatserver.models.mongodb.Category;
 import com.chathall.springchatserver.services.db.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;

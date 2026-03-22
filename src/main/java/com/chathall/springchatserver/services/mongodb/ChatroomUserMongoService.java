@@ -1,6 +1,6 @@
 package com.chathall.springchatserver.services.mongodb;
 
-import com.chathall.springchatserver.models.ChatroomUser;
+import com.chathall.springchatserver.models.mongodb.ChatroomUser;
 import com.chathall.springchatserver.repositories.ChatroomUserRepository;
 import com.chathall.springchatserver.services.db.ChatroomUserService;
 import lombok.RequiredArgsConstructor;

@@ -2,7 +2,7 @@ package com.chathall.springchatserver.dtos.frontend.mappers;
 
 import com.chathall.springchatserver.dtos.frontend.request.CategoryRequestDTO;
 import com.chathall.springchatserver.dtos.frontend.response.CategoryResponseDTO;
-import com.chathall.springchatserver.models.Category;
+import com.chathall.springchatserver.models.mongodb.Category;
 import org.mapstruct.Mapper;
 
 @Mapper
