@@ -4,7 +4,7 @@ import com.chathall.springchatserver.models.app.ChatroomUser;
 import com.chathall.springchatserver.models.data.mongodb.ChatroomUserMongo;
 import org.mapstruct.Mapper;
 
-@Mapper(uses = { AppUserDataMapper.class, MessageDataMapper.class })
+@Mapper(uses = { AppUserDataMapper.class })
 public interface ChatroomUserDataMapper {
 
     ChatroomUser toApp(ChatroomUserMongo chatroomUserMongo);

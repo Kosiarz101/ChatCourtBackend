@@ -5,11 +5,8 @@ import com.chathall.springchatserver.models.BaseModel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import org.springframework.data.annotation.ReadOnlyProperty;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
-
-import java.util.Set;
 
 @Getter
 @Setter
@@ -21,7 +18,4 @@ public class ChatroomUserMongo extends BaseModel {
     private AppUserMongo user;
     @DocumentReference
     private ChatroomMongo chatroom;
-    @ReadOnlyProperty
-    //@DocumentReference(lookup = "{ 'appUser':?#{#self._id} }")
-    private Set<MessageMongo> messages;
 }
