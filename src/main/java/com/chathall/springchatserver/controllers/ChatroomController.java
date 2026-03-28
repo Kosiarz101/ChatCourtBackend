@@ -8,7 +8,7 @@ import com.chathall.springchatserver.models.api.request.ChatroomRequestDTO;
 import com.chathall.springchatserver.models.api.response.ChatroomResponseDTO;
 import com.chathall.springchatserver.models.api.response.ChatroomSearchDTO;
 import com.chathall.springchatserver.models.app.Chatroom;
-import com.chathall.springchatserver.services.db.ChatroomService;
+import com.chathall.springchatserver.services.entity.ChatroomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatusCode;

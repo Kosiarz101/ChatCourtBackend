@@ -1,7 +1,6 @@
 package com.chathall.springchatserver.models.app;
 
 import com.chathall.springchatserver.enums.ChatroomUserRole;
-import com.chathall.springchatserver.models.BaseModel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;

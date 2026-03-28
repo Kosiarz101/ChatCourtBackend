@@ -1,6 +1,5 @@
 package com.chathall.springchatserver.models.data.mongodb;
 
-import com.chathall.springchatserver.models.BaseModel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -13,8 +12,8 @@ import java.util.Set;
 @Getter
 @Setter
 @Accessors(chain = true)
-@Document
-public class ChatroomMongo extends BaseModel {
+@Document(collection = "chatroom")
+public class ChatroomMongo extends BaseModelMongo {
     private String name;
     private String description;
     private boolean isPublic = true;

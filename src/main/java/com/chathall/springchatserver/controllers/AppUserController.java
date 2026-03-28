@@ -5,7 +5,7 @@ import com.chathall.springchatserver.models.api.request.RegisterUserDTO;
 import com.chathall.springchatserver.models.api.response.AppUserSimpleResponseDTO;
 import com.chathall.springchatserver.models.app.AppUser;
 import com.chathall.springchatserver.services.JWTTokenService;
-import com.chathall.springchatserver.services.db.AppUserService;
+import com.chathall.springchatserver.services.entity.AppUserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;
@@ -27,7 +27,7 @@ public class AppUserController {
     @PostMapping
     public ResponseEntity<AppUserSimpleResponseDTO> add(@RequestBody RegisterUserDTO appUserDTO) {
         var appUser = appUserAppMapper.fromRegisterUser(appUserDTO);
-        appUser = appUserService.add(appUser);
+        appUser = appUserService.create(appUser);
         return ResponseEntity.status(201).body(appUserAppMapper.toDTO(appUser));
     }
 

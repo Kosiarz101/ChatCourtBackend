@@ -4,7 +4,7 @@ import com.chathall.springchatserver.mappers.app.ChatroomUserAppMapper;
 import com.chathall.springchatserver.models.api.request.ChatroomUserRequestDTO;
 import com.chathall.springchatserver.models.api.response.ChatroomUserSimpleResponseDTO;
 import com.chathall.springchatserver.models.app.ChatroomUser;
-import com.chathall.springchatserver.services.db.ChatroomUserService;
+import com.chathall.springchatserver.services.entity.ChatroomUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;

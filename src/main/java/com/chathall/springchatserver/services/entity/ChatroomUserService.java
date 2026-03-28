@@ -1,4 +1,4 @@
-package com.chathall.springchatserver.services.db;
+package com.chathall.springchatserver.services.entity;
 
 import com.chathall.springchatserver.models.app.ChatroomUser;
 

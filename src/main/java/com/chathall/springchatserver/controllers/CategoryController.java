@@ -4,7 +4,7 @@ import com.chathall.springchatserver.mappers.app.CategoryAppMapper;
 import com.chathall.springchatserver.models.api.request.CategoryRequestDTO;
 import com.chathall.springchatserver.models.api.response.CategoryResponseDTO;
 import com.chathall.springchatserver.models.app.Category;
-import com.chathall.springchatserver.services.db.CategoryService;
+import com.chathall.springchatserver.services.entity.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +24,7 @@ public class CategoryController {
     @PostMapping
     public ResponseEntity<CategoryResponseDTO> add(@RequestBody CategoryRequestDTO categoryDTO) {
         Category category = categoryAppMapper.toApp(categoryDTO);
-        category = categoryService.add(category);
+        category = categoryService.create(category);
         return ResponseEntity.status(HttpStatusCode.valueOf(201)).body(categoryAppMapper.toDTO(category));
     }
 

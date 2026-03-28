@@ -1,21 +1,23 @@
 package com.chathall.springchatserver.repositories;
 
-import com.chathall.springchatserver.models.data.mongodb.MessageMongo;
-import org.springframework.data.domain.Pageable;
+import com.chathall.springchatserver.models.app.Message;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
-@Repository
-public interface MessageRepository extends MongoRepository<MessageMongo, UUID> {
+public interface MessageRepository {
 
-    List<MessageMongo> findAllByOrderByCreationDate();
+    Message create(Message message);
 
-    Slice<MessageMongo> findByChatroomIdAndCreationDateLessThanEqual(UUID chatroomId,
-                                                                     LocalDateTime endDate,
-                                                                     Pageable pageable);
+    Message update(Message message);
+
+    void delete(UUID id);
+
+    Optional<Message> getById(UUID id);
+
+    Slice<Message> findByChatroomIdAndCreationDateLessThanEqual(UUID chatroomId,
+                                                                LocalDateTime endDate,
+                                                                int page, int size);
 }

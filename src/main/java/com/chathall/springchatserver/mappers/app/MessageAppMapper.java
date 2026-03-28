@@ -1,8 +1,8 @@
 package com.chathall.springchatserver.mappers.app;
 
-import com.chathall.springchatserver.models.BaseModel;
 import com.chathall.springchatserver.models.api.request.MessageRequestDTO;
 import com.chathall.springchatserver.models.api.response.MessageResponseDTO;
+import com.chathall.springchatserver.models.app.BaseModel;
 import com.chathall.springchatserver.models.app.Chatroom;
 import com.chathall.springchatserver.models.app.ChatroomUser;
 import com.chathall.springchatserver.models.app.Message;

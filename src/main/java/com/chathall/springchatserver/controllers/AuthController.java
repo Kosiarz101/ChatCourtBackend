@@ -5,7 +5,7 @@ import com.chathall.springchatserver.models.api.request.LoginRequestDTO;
 import com.chathall.springchatserver.models.api.response.AppUserSimpleResponseDTO;
 import com.chathall.springchatserver.models.app.AppUser;
 import com.chathall.springchatserver.services.JWTTokenService;
-import com.chathall.springchatserver.services.db.AppUserService;
+import com.chathall.springchatserver.services.entity.AppUserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;

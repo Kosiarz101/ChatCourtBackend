@@ -1,6 +1,5 @@
 package com.chathall.springchatserver.models.data.mongodb;
 
-import com.chathall.springchatserver.models.BaseModel;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,8 +10,8 @@ import org.springframework.data.mongodb.core.mapping.DocumentReference;
 @Getter
 @Setter
 @Accessors(chain = true)
-@Document
-public class MessageMongo extends BaseModel {
+@Document("message")
+public class MessageMongo extends BaseModelMongo {
     @Size(max = 500)
     private String content;
     @DocumentReference

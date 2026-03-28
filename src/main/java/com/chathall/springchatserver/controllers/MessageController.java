@@ -5,7 +5,7 @@ import com.chathall.springchatserver.models.SliceResponse;
 import com.chathall.springchatserver.models.api.request.MessageRequestDTO;
 import com.chathall.springchatserver.models.api.response.MessageResponseDTO;
 import com.chathall.springchatserver.models.app.Message;
-import com.chathall.springchatserver.services.db.MessageService;
+import com.chathall.springchatserver.services.entity.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Slice;
@@ -45,7 +45,7 @@ public class MessageController {
     @MessageMapping("/message/update")
     public void updateMessage(@Payload MessageRequestDTO messageRequestDTO) {
         Message message = messageAppMapper.toApp(messageRequestDTO);
-        messageService.updateMessage(message);
+        message = messageService.update(message);
         simpMessagingTemplate.convertAndSend(stompDestination + "/message/update/" + message.getChatroom().getId(),
                 ResponseEntity.status(200).body(messageAppMapper.toDTO(message)));
     }
@@ -66,10 +66,11 @@ public class MessageController {
     @MessageMapping("/message/delete")
     public void deleteMessage(@Payload UUID id) {
         Message message = messageService.getById(id).orElseThrow(() ->
-            new ResponseStatusException(HttpStatusCode.valueOf(404), "Message with id=" + id.toString() + " doesn't exist")
+            new ResponseStatusException(
+                    HttpStatusCode.valueOf(404), "Message with id = " + id.toString() + " doesn't exist")
         );
-        messageService.deleteMessage(id);
+        messageService.delete(id);
         simpMessagingTemplate.convertAndSend(stompDestination + "/message/delete/" + message.getChatroom().getId(),
-                ResponseEntity.status(204).body(messageAppMapper.toDTO(message)));
+                ResponseEntity.status(204).body(new MessageResponseDTO().setId(id)));
     }
 }

@@ -1,4 +1,4 @@
-package com.chathall.springchatserver.services.db;
+package com.chathall.springchatserver.services.entity;
 
 import com.chathall.springchatserver.models.app.AppUser;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public interface AppUserService extends UserDetailsService {
 
-    AppUser add(AppUser AppUser);
+    AppUser create(AppUser AppUser);
 
     Optional<AppUser> getById(UUID id);
 

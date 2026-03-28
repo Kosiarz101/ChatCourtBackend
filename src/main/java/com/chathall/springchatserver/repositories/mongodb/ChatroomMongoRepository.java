@@ -1,12 +1,12 @@
-package com.chathall.springchatserver.services.mongodb;
+package com.chathall.springchatserver.repositories.mongodb;
 
 import com.chathall.springchatserver.mappers.data.ChatroomDataMapper;
-import com.chathall.springchatserver.models.app.ChatroomSearch;
 import com.chathall.springchatserver.models.app.Chatroom;
+import com.chathall.springchatserver.models.app.ChatroomSearch;
 import com.chathall.springchatserver.models.data.mongodb.ChatroomMongo;
 import com.chathall.springchatserver.repositories.ChatroomRepository;
-import com.chathall.springchatserver.repositories.ChatroomUserRepository;
-import com.chathall.springchatserver.services.db.ChatroomService;
+import com.chathall.springchatserver.repositories.mongodb.spring.ChatroomSpringMongoRepository;
+import com.chathall.springchatserver.repositories.mongodb.spring.ChatroomUserSpringMongoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
@@ -15,7 +15,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -26,17 +25,15 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class ChatroomMongoService implements ChatroomService {
+public class ChatroomMongoRepository implements ChatroomRepository {
 
-    private final int DEFAULT_CHATROOM_SIZE = 5;
-    private final int DEFAULT_CHATROOM_PAGE = 0;
-
-    private final ChatroomRepository chatroomRepository;
-    private final ChatroomUserRepository chatroomUserRepository;
+    private final ChatroomSpringMongoRepository chatroomRepository;
+    private final ChatroomUserSpringMongoRepository chatroomUserRepository;
     private final ChatroomDataMapper chatroomDataMapper;
     private final MongoTemplate mongoTemplate;
 
-    public Chatroom add(Chatroom chatroom) {
+    @Override
+    public Chatroom create(Chatroom chatroom) {
         chatroom.setNewId();
         LocalDateTime now = LocalDateTime.now();
         chatroom.setCreationDate(now);
@@ -48,17 +45,20 @@ public class ChatroomMongoService implements ChatroomService {
         return chatroomDataMapper.toApp(chatroomMongo);
     }
 
-    public Slice<Chatroom> findAll(@Nullable Integer pageNumber, @Nullable Integer pageSize) {
+    @Override
+    public Slice<Chatroom> findAllByOrderByCreationDateDesc(int pageNumber, int pageSize) {
         Slice<ChatroomMongo> chatroomMongos = chatroomRepository
-                .findAllByOrderByCreationDateDesc(PageRequest.of(getPage(pageNumber), getPageSize(pageSize)));
+                .findAllByOrderByCreationDateDesc(PageRequest.of(pageNumber, pageSize));
         return chatroomMongos.map(chatroomDataMapper::toApp);
     }
 
+    @Override
     public Optional<Chatroom> findById(UUID id) {
         var chatroomMongo = chatroomRepository.findById(id);
         return chatroomMongo.map(chatroomDataMapper::toApp);
     }
 
+    @Override
     public Optional<Chatroom> findById(UUID id, boolean includeMessages, boolean includeChatroomUsers) {
         AggregationOperation match = new MatchOperation(Criteria.where("_id").is(id));
         List<AggregationOperation> pipeline = new ArrayList<>(List.of(match));
@@ -76,10 +76,9 @@ public class ChatroomMongoService implements ChatroomService {
         return Optional.of(chatroomDataMapper.toApp(chatroomMongo));
     }
 
+    @Override
     public Slice<Chatroom> findByUserId(UUID chatroomUserId, boolean includeMessages, boolean includeChatroomUsers,
-                                        @Nullable Integer page, @Nullable Integer size) {
-        page = getPage(page);
-        size = getPageSize(size);
+                                        int page, int size) {
         Slice<UUID> chatroomUsers = chatroomUserRepository
                 .findChatroomIdsByUserId(chatroomUserId, PageRequest.of(page, size + 1));
         List<UUID> chatroomIds = chatroomUsers.getContent().stream().toList();
@@ -110,19 +109,20 @@ public class ChatroomMongoService implements ChatroomService {
         return new SliceImpl<>(chatrooms, PageRequest.of(page, size), hasNext);
     }
 
-    public Slice<ChatroomSearch> findByNameAndCategoryId(String name, UUID categoryId, @Nullable Integer page,
-                                                         @Nullable Integer size) {
+    @Override
+    public Slice<ChatroomSearch> findAllPublicByNameAndCategory(String name, UUID categoryId, int page, int size) {
         return chatroomRepository
-                .findAllPublicByNameAndCategory(name, categoryId, PageRequest.of(getPage(page), getPageSize(size)));
+                .findAllPublicByNameAndCategory(name, categoryId, PageRequest.of(page, size));
     }
 
-    public Slice<ChatroomSearch> findByNameContains(String name, @Nullable Integer page, @Nullable Integer size) {
-        return chatroomRepository.findAllPublicByName(name, PageRequest.of(getPage(page), getPageSize(size)));
+    @Override
+    public Slice<ChatroomSearch> findAllPublicByName(String name, int page, int size) {
+        return chatroomRepository.findAllPublicByName(name, PageRequest.of(page, size));
     }
 
     private AggregationOperation createMessagesLookup() {
         AggregationOperation sort = new SortOperation(Sort.by(Sort.Direction.DESC, "creationDate"));
-        AggregationOperation messagesLimit = new LimitOperation(DEFAULT_CHATROOM_SIZE);
+        AggregationOperation messagesLimit = new LimitOperation(5); // change do default
         AggregationPipeline aggPipeline = new AggregationPipeline();
         aggPipeline.add(sort);
         aggPipeline.add(messagesLimit);
@@ -136,13 +136,5 @@ public class ChatroomMongoService implements ChatroomService {
         aggPipeline.add(sort);
         return new LookupOperation("chatroomUser", Fields.field("_id"), Fields.field("chatroom"),
                 null, aggPipeline, Fields.field("users"));
-    }
-
-    private int getPage(Integer requestPageNumber) {
-        return requestPageNumber == null ? DEFAULT_CHATROOM_PAGE : requestPageNumber;
-    }
-
-    private int getPageSize(Integer requestPageSize) {
-        return requestPageSize == null ? DEFAULT_CHATROOM_SIZE : requestPageSize;
     }
 }

@@ -1,4 +1,4 @@
-package com.chathall.springchatserver.services.db;
+package com.chathall.springchatserver.services.entity;
 
 import com.chathall.springchatserver.models.app.Message;
 import org.springframework.data.domain.Slice;
@@ -13,9 +13,9 @@ public interface MessageService {
 
     Slice<Message> getByChatroomIdAndBeforeOrEqualCreationDate(UUID chatroomId, LocalDateTime date, Integer page, Integer size);
 
-    Message updateMessage(Message Message);
+    Message update(Message Message);
 
-    void deleteMessage(UUID id);
+    void delete(UUID id);
 
     Optional<Message> getById(UUID id);
 }
