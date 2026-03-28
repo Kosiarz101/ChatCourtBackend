@@ -1,0 +1,65 @@
+package com.chathall.springchatserver.api.controllers;
+
+import com.chathall.springchatserver.api.mappers.AppUserAppMapper;
+import com.chathall.springchatserver.api.models.request.RegisterUserDTO;
+import com.chathall.springchatserver.api.models.response.AppUserSimpleResponseDTO;
+import com.chathall.springchatserver.app.models.AppUser;
+import com.chathall.springchatserver.app.services.AppUserService;
+import com.chathall.springchatserver.services.JWTTokenService;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.UUID;
+
+@RestController
+@RequestMapping("/user")
+@RequiredArgsConstructor
+public class AppUserController {
+
+    private final AppUserService appUserService;
+    private final AppUserAppMapper appUserAppMapper;
+    private final JWTTokenService tokenService;
+
+    @PostMapping
+    public ResponseEntity<AppUserSimpleResponseDTO> add(@RequestBody RegisterUserDTO appUserDTO) {
+        var appUser = appUserAppMapper.fromRegisterUser(appUserDTO);
+        appUser = appUserService.create(appUser);
+        return ResponseEntity.status(201).body(appUserAppMapper.toDTO(appUser));
+    }
+
+//    @GetMapping
+//    public ResponseEntity<Slice<AppUser>> getBy(@RequestParam(required = false) Integer page,
+//                                                @RequestParam(required = false) Integer size,
+//                                                @RequestParam(required = false) String chatroomId) {
+//        Slice<AppUser> response;
+//        Map<String, Object> parameters = Map.of("chatroomId", chatroomId);
+//        response = appUserService.getBy(parameters, page, size);
+//        return ResponseEntity.ok(appUserService.exists("email", email));
+//    }
+
+
+    @GetMapping(path = "/exists-by-email")
+    public ResponseEntity<Boolean> existsByEmail(String email) {
+        return ResponseEntity.ok(appUserService.exists("email", email));
+    }
+
+    @GetMapping(path = "/exists")
+    public ResponseEntity<Boolean> exists(@RequestParam(required = false) UUID id,
+                                          @RequestParam(required = false) String email) {
+        return ResponseEntity.ok(appUserService.exists("email", email));
+    }
+
+    @GetMapping
+    public ResponseEntity<AppUserSimpleResponseDTO> getCurrentUser(HttpServletRequest httpServletRequest) {
+        String jwt = tokenService.getJwtFromCookie(httpServletRequest);
+        String email = tokenService.getEmailFromJWTToken(jwt);
+        AppUser appUser = appUserService.getByEmail(email).orElseThrow(
+                () -> new ResponseStatusException(HttpStatusCode.valueOf(404), "User with this email doesn't exist")
+        );
+        return ResponseEntity.ok(appUserAppMapper.toDTO(appUser));
+    }
+}
