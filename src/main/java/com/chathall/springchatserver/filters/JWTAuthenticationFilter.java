@@ -16,6 +16,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 public class JWTAuthenticationFilter extends OncePerRequestFilter {
+
     @Value("${jwt.cookie.name}")
     private String accessTokenCookieName;
     private final JWTTokenService tokenService;
