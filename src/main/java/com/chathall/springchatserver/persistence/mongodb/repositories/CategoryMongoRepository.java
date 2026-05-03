@@ -1,15 +1,16 @@
 package com.chathall.springchatserver.persistence.mongodb.repositories;
 
-import com.chathall.springchatserver.persistence.mongodb.mappers.CategoryDataMapper;
 import com.chathall.springchatserver.app.models.Category;
+import com.chathall.springchatserver.persistence.mongodb.mappers.CategoryDataMapper;
 import com.chathall.springchatserver.persistence.mongodb.models.CategoryMongo;
-import com.chathall.springchatserver.persistence.repositories.CategoryRepository;
 import com.chathall.springchatserver.persistence.mongodb.repositories.spring.CategorySpringMongoRepository;
+import com.chathall.springchatserver.persistence.repositories.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +34,17 @@ public class CategoryMongoRepository implements CategoryRepository {
     }
 
     @Override
+    public boolean existsById(UUID id) {
+        return categoryRepository.existsById(id);
+    }
+
+    @Override
     public boolean existsByName(String name) {
         return categoryRepository.existsByName(name);
+    }
+
+    @Override
+    public void delete(UUID id) {
+        categoryRepository.deleteById(id);
     }
 }

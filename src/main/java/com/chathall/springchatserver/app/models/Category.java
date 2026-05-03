@@ -9,4 +9,5 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class Category extends BaseModel {
     private String name;
+    private String description;
 }

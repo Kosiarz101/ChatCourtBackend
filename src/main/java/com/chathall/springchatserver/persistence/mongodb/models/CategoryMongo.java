@@ -11,4 +11,5 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "category")
 public class CategoryMongo extends BaseModelMongo {
     private String name;
+    private String description;
 }

@@ -14,11 +14,7 @@ import java.util.UUID;
 @Accessors(chain = true)
 public abstract class BaseModelMongo {
     @Id
-    private UUID id = UUID.randomUUID();
+    private UUID id;
     private LocalDateTime creationDate;
     private LocalDateTime lastModifiedDate;
-
-    public void setNewId() {
-        id = UUID.randomUUID();
-    }
 }

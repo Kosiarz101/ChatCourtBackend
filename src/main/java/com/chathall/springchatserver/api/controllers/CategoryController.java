@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -32,5 +33,11 @@ public class CategoryController {
     public ResponseEntity<List<CategoryResponseDTO>> findAll() {
         List<Category> categories = categoryService.findAllSortByName();
         return ResponseEntity.ok(categories.stream().map(categoryAppMapper::toDTO).collect(Collectors.toList()));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<CategoryResponseDTO> delete(@PathVariable UUID id) {
+        categoryService.delete(id);
+        return ResponseEntity.status(HttpStatusCode.valueOf(204)).build();
     }
 }
