@@ -1,4 +1,4 @@
-package com.chathall.springchatserver.api.validators;
+package com.chathall.springchatserver.app.validators;
 
 import com.chathall.springchatserver.app.models.Category;
 
